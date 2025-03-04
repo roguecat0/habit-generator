@@ -4,6 +4,4 @@ class MyService() {
     fun serviceString(): String {
         return "service"
     }
-
-
 }

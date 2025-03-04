@@ -1,11 +1,13 @@
 package com.example.habitgenerator
 
+import com.example.habitgenerator.services.HabitService
 import com.example.habitgenerator.services.MyService
-import com.example.habitgenerator.ui.viewmodels.MainViewModel
+import com.example.habitgenerator.presentation.EditHabitListViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
     single<MyService> { MyService() }
-    viewModel {MainViewModel(myService = get(), savedStateHandle = get())}
+    single {HabitService()}
+    viewModel { EditHabitListViewModel(get(), get()) }
 }
