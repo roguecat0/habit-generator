@@ -99,4 +99,9 @@ class HabitService {
     fun getNewId(habits: List<Habit>): Int {
         return (habits.maxByOrNull { it.id }?.id ?: 0) + 1
     }
+
+    fun parseHabitsToJson(habits: List<Habit>): String {
+        return habits.map { it.toDTO() }.let { Log.d(TAG, "parseHabitsToJson: $it");it }
+            .toTamaCompatString()
+    }
 }

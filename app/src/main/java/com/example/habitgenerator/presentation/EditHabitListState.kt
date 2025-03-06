@@ -24,4 +24,5 @@ sealed interface EditHabitListEvent {
     data class ChangeHabitStartFrom(val startFrom: String, val id: Int) : EditHabitListEvent
 
     data object NewHabit : EditHabitListEvent
+    data class ParseHabits(val clipboardCopy: (String) -> Unit) : EditHabitListEvent
 }

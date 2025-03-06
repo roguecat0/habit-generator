@@ -18,7 +18,7 @@ class HabitDTOTest {
     @Test
     fun makesString() {
         val dto: HabitDTO = SimpleHabitDTO(
-            3, true, false, true, "lol", 3
+            "3", true, false, true, "lol", 3
         )
         val str = dto.toJsonString()
         println(str)
@@ -26,9 +26,21 @@ class HabitDTOTest {
     }
 
     @Test
+    fun makesString2() {
+        val string =
+            """{"id":"3","completed":true,"failed":false,"enabled":true,"name":"lol","startFrom":3}"""
+        val dto: HabitDTO = SimpleHabitDTO(
+            "3", true, false, true, "lol", 3
+        )
+        val str = dto.toJsonString()
+        println(str)
+        assertEquals(str, string)
+    }
+
+    @Test
     fun fromString() {
         val dto: HabitDTO = SimpleHabitDTO(
-            3, true, false, true, "lol", 3
+            "3", true, false, true, "lol", 3
         )
         val str = dto.toJsonString()
         println(str)
@@ -40,7 +52,7 @@ class HabitDTOTest {
         val string =
             "{\"id\":\"3\",\"completed\":true,\"failed\":false,\"name\":\"lol\",\"startFrom\":3}"
         val dto: HabitDTO = SimpleHabitDTO(
-            3, true, false, true, "lol", 3
+            "3", true, false, true, "lol", 3
         )
         assertEquals(SimpleHabitDTO.Companion.fromJson(string), dto)
     }
@@ -57,7 +69,7 @@ class HabitDTOTest {
                 }
             """.trimMargin()
         val dto: HabitDTO = SimpleHabitDTO(
-            3, true, false, true, "lol",
+            "3", true, false, true, "lol",
         )
         assertEquals(SimpleHabitDTO.fromJson(string), dto)
     }
@@ -66,13 +78,13 @@ class HabitDTOTest {
     fun MultiPart() {
         val list: List<HabitDTO> = listOf(
             SimpleHabitDTO(
-                3, true, false, true, "lol",
+                "3", true, false, true, "lol",
             ),
             SimpleHabitDTO(
-                2, true, false, true, "later", startFrom = 4
+                "2", true, false, true, "later", startFrom = 4
             ),
             SimpleHabitDTO(
-                8, true, false, true, "lol", streakName = mapOf(
+                "8", true, false, true, "lol", streakName = mapOf(
                     3 to "cool",
                     2 to "spectacular"
                 )
@@ -86,7 +98,7 @@ class HabitDTOTest {
     @Test
     fun toHabit() {
         val dto = SimpleHabitDTO(
-            0, completed = true, failed = true,
+            "0", completed = true, failed = true,
             enabled = false, name = "yolo", startFrom = 3, streakName = mapOf(3 to "lol")
         )
         val habit = Habit(
@@ -102,7 +114,7 @@ class HabitDTOTest {
     @Test
     fun toSimpleDTO() {
         val dto = SimpleHabitDTO(
-            0, completed = true, failed = true,
+            "0", completed = true, failed = true,
             enabled = false, name = "yolo", startFrom = 3, streakName = mapOf(3 to "lol")
         )
         val habit = Habit(

@@ -1,5 +1,6 @@
 package com.example.habitgenerator.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import org.koin.androidx.compose.koinViewModel
 
@@ -66,9 +70,16 @@ fun MultiFab(
     modifier: Modifier = Modifier,
     onEvent: (EditHabitListEvent) -> Unit = {}
 ) {
+    val clipboardManager = LocalClipboardManager.current
+    val context = LocalContext.current
     Column(horizontalAlignment = Alignment.End, modifier = modifier) {
         FloatingActionButton(onClick = {
-        }) {
+            onEvent(EditHabitListEvent.ParseHabits { json ->
+                clipboardManager.setText(AnnotatedString(json))
+            })
+            Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+        }
+        ) {
             Icon(Icons.Filled.Done, contentDescription = "")
         }
         Spacer(modifier = Modifier.height(16.dp))

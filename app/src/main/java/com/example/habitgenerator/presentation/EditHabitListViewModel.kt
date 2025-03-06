@@ -1,6 +1,10 @@
 package com.example.habitgenerator.presentation
 
+import android.content.ClipData
+import android.content.Context
 import android.util.Log
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.habitgenerator.services.Habit
@@ -8,6 +12,7 @@ import com.example.habitgenerator.services.HabitService
 import com.example.habitgenerator.services.util.splitPairs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+
 
 const val TAG = "EditHabitListViewModel"
 
@@ -57,6 +62,10 @@ class EditHabitListViewModel(
 
             is EditHabitListEvent.DeleteHabitStreakName -> {
                 deleteHabitStreak(event.id, event.streakNameIndex)
+            }
+
+            is EditHabitListEvent.ParseHabits -> {
+                parseHabitsToClipboard(event.clipboardCopy)
             }
         }
         Log.d(TAG, "onEvent: ${_state.value}")
@@ -140,6 +149,13 @@ class EditHabitListViewModel(
         val inter = _state.value.habits + newUiHabit
         _state.value = _state.value
             .copy(habits = inter)
+    }
+
+    private fun parseHabitsToClipboard(clipboardCopy: (String) -> Unit) {
+        val (habits, _) = _state.value.habits.splitPairs()
+        val json = habitService.parseHabitsToJson(habits)
+        Log.d(TAG, "parseHabitsToClipboard: $json")
+        clipboardCopy(json)
     }
 
 
