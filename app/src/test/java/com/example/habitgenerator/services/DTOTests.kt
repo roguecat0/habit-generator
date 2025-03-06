@@ -1,6 +1,11 @@
 package com.example.habitgenerator.services
 
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.MapSerializer
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -64,10 +69,17 @@ class HabitDTOTest {
                 "3", true, false, true, "lol",
             ),
             SimpleHabitDTO(
-                "3", true, false, true, "lol",
+                "4", true, false, true, "later", startFrom = 4
+            ),
+            SimpleHabitDTO(
+                "5", true, false, true, "lol", streakName = mapOf(
+                    3 to "cool",
+                    2 to "spectacular"
+                )
             ),
         )
-        val jsonElements = list.map { it.toJson() }
-        println(Json.encodeToString())
+        val tamaJson = list.toTamaCompatString()
+        println(tamaJson)
+        assert(tamaJson.isNotEmpty())
     }
 }
