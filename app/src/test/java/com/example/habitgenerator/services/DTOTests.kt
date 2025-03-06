@@ -28,9 +28,22 @@ class HabitDTOTest {
     @Test
     fun makesString2() {
         val string =
-            """{"id":"3","completed":true,"failed":false,"enabled":true,"name":"lol","startFrom":3}"""
+            """{"id":"3","completed":true,"failed":false,"name":"lol","start_at_streak":3}"""
         val dto: HabitDTO = SimpleHabitDTO(
             "3", true, false, true, "lol", 3
+        )
+        val str = dto.toJsonString()
+        println(str)
+        assertEquals(str, string)
+    }
+
+    @Test
+    fun makesString3() {
+        val string =
+            """ { "completed": false, "enabled": false, "failed": false, "id": "1", "name": "Morning Routine", "start_at_streak": 0 }
+            """.trimIndent()
+        val dto: HabitDTO = SimpleHabitDTO(
+            "1", true, false, true, "Morning Routine", 1
         )
         val str = dto.toJsonString()
         println(str)
@@ -50,7 +63,7 @@ class HabitDTOTest {
     @Test
     fun makeObject() {
         val string =
-            "{\"id\":\"3\",\"completed\":true,\"failed\":false,\"name\":\"lol\",\"startFrom\":3}"
+            "{\"id\":\"3\",\"completed\":true,\"failed\":false,\"name\":\"lol\",\"start_at_streak\":3}"
         val dto: HabitDTO = SimpleHabitDTO(
             "3", true, false, true, "lol", 3
         )

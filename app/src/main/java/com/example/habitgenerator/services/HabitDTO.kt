@@ -2,7 +2,9 @@ package com.example.habitgenerator.services
 
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
@@ -40,8 +42,11 @@ data class SimpleHabitDTO @OptIn(ExperimentalSerializationApi::class) constructo
     val id: String,
     val completed: Boolean,
     val failed: Boolean,
-    @EncodeDefault val enabled: Boolean = true,
+    @Transient
+    val enabled: Boolean = true,
     val name: String,
+    @EncodeDefault
+    @SerialName("start_at_streak")
     val startFrom: Int = 0,
     val streakName: Map<Int, String>? = null,
 ) : HabitDTO {

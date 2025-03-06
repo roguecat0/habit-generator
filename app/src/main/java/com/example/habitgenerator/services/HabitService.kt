@@ -71,13 +71,13 @@ class HabitService {
     }
 
     fun changeHabitStreakValue(habit: Habit, streakStart: String, index: Int): Habit {
-        val start = streakStart.toInt()
+        val start = streakStart.toIntOrNull() ?: 0
         return changeHabitStreakAspect(habit, index) { pair -> start to pair.second }
 
     }
 
     fun changeHabitStartFrom(habit: Habit, startFrom: String): Habit {
-        val start = startFrom.toInt()
+        val start = startFrom.toIntOrNull() ?: 0
         return habit.copy(startFrom = start)
     }
 
