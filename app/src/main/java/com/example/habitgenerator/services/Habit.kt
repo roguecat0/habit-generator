@@ -3,7 +3,7 @@ package com.example.habitgenerator.services
 data class Habit(
     val id: Int = 0,
     val name: String = "",
-    val enabled: Boolean = false,
+    val enabled: Boolean = true,
     val startFrom: Int = 0,
     val completed: Boolean = false,
     val failed: Boolean = false,

@@ -1,6 +1,5 @@
 package com.example.habitgenerator.presentation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,17 +25,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.habitgenerator.Greeting
-import com.example.habitgenerator.services.Habit
-import com.example.habitgenerator.services.HabitType
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun EditHabitListScreenRoot(
-    viewModel: EditHabitListViewModel = koinViewModel() ) {
+    viewModel: EditHabitListViewModel = koinViewModel()
+) {
     val state by viewModel.state.collectAsState()
     val onEvent = viewModel::onEvent
-    EditHabitListScreen()
+    EditHabitListScreen(state = state, onEvent = onEvent)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,18 +45,16 @@ fun EditHabitListScreen(
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Edit Habits") }) },
-        floatingActionButton = { MultiFab(Modifier.padding(bottom = 32.dp)) }
-        
+        floatingActionButton = { MultiFab(Modifier.padding(bottom = 32.dp), onEvent = onEvent) }
+
     ) { padding ->
-        LazyColumn(modifier = Modifier
-            .padding(padding)
-            .fillMaxWidth()) {
-            items(listOf(1,2)) {
-                if (it == 1) {
-                    EditHabit(expanded = false)
-                } else {
-                    EditHabit()
-                }
+        LazyColumn(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxWidth()
+        ) {
+            items(state.habits) {
+                EditHabit(habit = it.first, expanded = it.second, onEvent)
             }
         }
 
@@ -71,21 +66,24 @@ fun MultiFab(
     modifier: Modifier = Modifier,
     onEvent: (EditHabitListEvent) -> Unit = {}
 ) {
-    Column(horizontalAlignment = Alignment.End, modifier = modifier ) {
-        FloatingActionButton(onClick = {}) {
+    Column(horizontalAlignment = Alignment.End, modifier = modifier) {
+        FloatingActionButton(onClick = {
+        }) {
             Icon(Icons.Filled.Done, contentDescription = "")
         }
         Spacer(modifier = Modifier.height(16.dp))
         ExtendedFloatingActionButton(
-            onClick = {},
+            onClick = {
+                onEvent(EditHabitListEvent.NewHabit)
+            },
             modifier = Modifier
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Add Habit")
                 Spacer(modifier.width(4.dp))
                 Icon(Icons.Filled.Add, contentDescription = "")
             }
         }
     }
-    
+
 }

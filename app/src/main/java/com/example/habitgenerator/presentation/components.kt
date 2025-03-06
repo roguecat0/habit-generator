@@ -1,20 +1,16 @@
 package com.example.habitgenerator.presentation
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,11 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.habitgenerator.services.Habit
 import com.example.habitgenerator.services.HabitType
+import kotlin.math.exp
 
 @Composable
 fun EditHabit(
     habit: Habit = Habit(),
-    expanded: Boolean = true
+    expanded: Boolean = true,
+    onEvent: (EditHabitListEvent) -> Unit = {},
 ) {
 
     Column(
@@ -44,12 +42,23 @@ fun EditHabit(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            CircleShape("A")
+            val (symbol, label) = when (habit.habitType) {
+                is HabitType.SingleHabit -> {
+                    listOf("S", "Single Habit")
+                }
+
+                else -> {
+                    listOf("", "")
+                }
+            }
+            CircleShape(symbol)
             Spacer(Modifier.width(8.dp))
             OutlinedTextField(
                 value = habit.name,
-                onValueChange = {},
-                label = {Text("single habit")},
+                onValueChange = {
+                    onEvent(EditHabitListEvent.ChangeHabitName(it, habit.id))
+                },
+                label = { Text(label) },
                 modifier = Modifier.fillMaxWidth(fraction = 0.6f)
             )
             Row(
@@ -58,12 +67,20 @@ fun EditHabit(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Checkbox(
-                    checked = false,
-                    onCheckedChange = {}
+                    checked = habit.enabled,
+                    onCheckedChange = {
+                        onEvent(EditHabitListEvent.ToggleHabitEnabled(habit.id))
+                    }
                 )
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    onEvent(EditHabitListEvent.ToggleHabitExpanded(habit.id))
+                }) {
                     Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
+                        imageVector = if (expanded) {
+                            Icons.Default.KeyboardArrowDown
+                        } else {
+                            Icons.Default.KeyboardArrowUp
+                        },
                         contentDescription = ""
                     )
                 }
@@ -79,50 +96,54 @@ fun EditHabit(
 fun SingleHabitPart(
     habit: Habit,
     singlePart: HabitType.SingleHabit = HabitType.SingleHabit(
-        hashMapOf(Pair(3,"first"))
+        hashMapOf(Pair(3, "first"))
     )
 ) {
-   Column {
-       Row(
-           horizontalArrangement = Arrangement.SpaceBetween,
-           verticalAlignment = Alignment.CenterVertically,
-           modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth()
-       ) {
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth()
+        ) {
 
-           OutlinedTextField(
-               value = habit.startFrom.toString(),
-               onValueChange = {},
-               label = { Text("start from") }
-           )
-           IconButton(onClick = {}) {
-               Icon(
-                   imageVector = Icons.Default.Delete,
-                   contentDescription = ""
-               )
-           }
-       }
-       singlePart.streakName?.let { streakNames ->
-           for (pair in streakNames.toList()) {
-               Row(
-                   horizontalArrangement = Arrangement.SpaceBetween,
-                   verticalAlignment = Alignment.CenterVertically,
-                   modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
-               ) {
-                   OutlinedTextField(
-                       value = pair.second,
-                       onValueChange = {},
-                       label = { Text("name") }
-                   )
-                   OutlinedTextField(
-                       value = pair.first.toString(),
-                       onValueChange = {},
-                       label = { Text("start from") }
-                   )
-               }
+            OutlinedTextField(
+                value = habit.startFrom.toString(),
+                onValueChange = {},
+                label = { Text("start from") }
+            )
+            IconButton(onClick = {}) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = ""
+                )
+            }
+        }
+        singlePart.streakName?.let { streakNames ->
+            for (pair in streakNames.toList()) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = pair.second,
+                        onValueChange = {},
+                        label = { Text("name") }
+                    )
+                    OutlinedTextField(
+                        value = pair.first.toString(),
+                        onValueChange = {},
+                        label = { Text("start from") }
+                    )
+                }
 
-           }
-       }
-   }
+            }
+        }
+    }
 }
 
 @Preview
