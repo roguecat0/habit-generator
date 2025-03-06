@@ -36,6 +36,24 @@ class EditHabitListViewModel(
             is EditHabitListEvent.ToggleHabitExpanded -> {
                 toggleHabitExpand(event.id)
             }
+
+            is EditHabitListEvent.DeleteHabit -> deleteHabit(event.id)
+            is EditHabitListEvent.ChangeHabitStartFrom -> {
+                changeHabitStartFrom(event.startFrom, event.id)
+            }
+        }
+    }
+
+    private fun deleteHabit(id: Int) {
+        _state.value = _state.value.copy(
+            habits = _state.value.habits
+                .filter { it.first.id != id }
+        )
+    }
+
+    private fun changeHabitStartFrom(startFrom: String, id: Int) {
+        changeAHabitValue(id = id) {
+            habitService.changeHabitStartFrom(it, startFrom)
         }
     }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.habitgenerator.services.Habit
@@ -77,9 +79,9 @@ fun EditHabit(
                 }) {
                     Icon(
                         imageVector = if (expanded) {
-                            Icons.Default.KeyboardArrowDown
-                        } else {
                             Icons.Default.KeyboardArrowUp
+                        } else {
+                            Icons.Default.KeyboardArrowDown
                         },
                         contentDescription = ""
                     )
@@ -87,7 +89,7 @@ fun EditHabit(
             }
         }
         if (expanded) {
-            SingleHabitPart(habit)
+            SingleHabitPart(habit, onEvent)
         }
     }
 }
@@ -95,6 +97,7 @@ fun EditHabit(
 @Composable
 fun SingleHabitPart(
     habit: Habit,
+    onEvent: (EditHabitListEvent) -> Unit,
     singlePart: HabitType.SingleHabit = HabitType.SingleHabit(
         hashMapOf(Pair(3, "first"))
     )
@@ -109,11 +112,16 @@ fun SingleHabitPart(
         ) {
 
             OutlinedTextField(
-                value = habit.startFrom.toString(),
-                onValueChange = {},
+                value = if (habit.startFrom == 0) {
+                    ""
+                } else {
+                    habit.startFrom.toString()
+                },
+                onValueChange = { onEvent(EditHabitListEvent.ChangeHabitStartFrom(it, habit.id)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 label = { Text("start from") }
             )
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onEvent(EditHabitListEvent.DeleteHabit(habit.id)) }) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = ""

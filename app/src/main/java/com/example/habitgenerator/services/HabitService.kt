@@ -5,6 +5,11 @@ class HabitService {
         return habit.copy(name = name)
     }
 
+    fun changeHabitStartFrom(habit: Habit, startFrom: String): Habit {
+        val start = startFrom.toInt()
+        return habit.copy(startFrom = start)
+    }
+
     fun toggleHabitEnabled(habit: Habit): Habit {
         return habit.copy(enabled = !habit.enabled)
     }
@@ -18,6 +23,7 @@ class HabitService {
             }
         }
     }
+
 
     fun getNewId(habits: List<Habit>): Int {
         return (habits.maxByOrNull { it.id }?.id ?: 0) + 1
