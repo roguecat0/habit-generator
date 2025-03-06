@@ -23,13 +23,31 @@ class HabitService {
         }
     }
 
+    fun deleteHabitStreak(
+        habit: Habit,
+        index: Int,
+    ): Habit {
+        return when (val type = habit.habitType) {
+            is HabitType.SingleHabit -> {
+                habit.copy(
+                    habitType = HabitType.SingleHabit(
+                        streakNames = type.streakNames.filterIndexed { i, _ ->
+                            i != index
+                        })
+                )
+            }
+
+            else -> habit
+        }
+
+    }
+
 
     private fun changeHabitStreakAspect(
         habit: Habit,
         index: Int,
         operation: (Pair<Int, String>) -> Pair<Int, String>
     ): Habit {
-        Log.d(TAG, "changeHabitStreakAspect: $habit")
         return when (val type = habit.habitType) {
             is HabitType.SingleHabit -> {
                 habit.copy(

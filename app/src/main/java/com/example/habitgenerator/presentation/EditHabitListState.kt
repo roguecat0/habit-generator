@@ -14,6 +14,9 @@ sealed interface EditHabitListEvent {
     data class ChangeHabitStreakValue(val start: String, val id: Int, val streakNameIndex: Int) :
         EditHabitListEvent
 
+    data class DeleteHabitStreakName(val id: Int, val streakNameIndex: Int) :
+        EditHabitListEvent
+
     data class AddHabitStreakName(val id: Int) : EditHabitListEvent
     data class ToggleHabitEnabled(val id: Int) : EditHabitListEvent
     data class ToggleHabitExpanded(val id: Int) : EditHabitListEvent

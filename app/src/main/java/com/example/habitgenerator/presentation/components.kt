@@ -2,6 +2,7 @@ package com.example.habitgenerator.presentation
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -147,7 +148,8 @@ fun SingleHabitPart(
                             )
                         )
                     },
-                    label = { Text("name") }
+                    label = { Text("name") },
+                    modifier = Modifier.fillMaxWidth(.4f)
                 )
                 OutlinedTextField(
                     value = if (pair.first == 0) {
@@ -159,15 +161,35 @@ fun SingleHabitPart(
                         onEvent(EditHabitListEvent.ChangeHabitStreakValue(it, habit.id, i))
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    label = { Text("start from") }
+                    label = { Text("from") },
+                    modifier = Modifier.fillMaxWidth(.4f)
                 )
+                IconButton(onClick = {
+                    onEvent(
+                        EditHabitListEvent.DeleteHabitStreakName(
+                            habit.id,
+                            i
+                        )
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = ""
+                    )
+                }
             }
         }
-        IconButton(onClick = { onEvent(EditHabitListEvent.AddHabitStreakName(habit.id)) }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = ""
-            )
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            IconButton(
+                onClick = { onEvent(EditHabitListEvent.AddHabitStreakName(habit.id)) },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = ""
+                )
+            }
+
         }
     }
 }

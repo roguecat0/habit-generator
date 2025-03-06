@@ -54,6 +54,10 @@ class EditHabitListViewModel(
             is EditHabitListEvent.AddHabitStreakName -> {
                 addHabitStreakName(event.id)
             }
+
+            is EditHabitListEvent.DeleteHabitStreakName -> {
+                deleteHabitStreak(event.id, event.streakNameIndex)
+            }
         }
         Log.d(TAG, "onEvent: ${_state.value}")
     }
@@ -63,6 +67,13 @@ class EditHabitListViewModel(
             habits = _state.value.habits
                 .filter { uiHabit -> uiHabit.first.id != id }
         )
+    }
+
+    private fun deleteHabitStreak(id: Int, streakIndex: Int) {
+        changeAHabitValue(id = id) {
+            habitService.deleteHabitStreak(it, streakIndex)
+        }
+
     }
 
     private fun changeHabitStartFrom(startFrom: String, id: Int) {
