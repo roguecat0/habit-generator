@@ -25,7 +25,7 @@ fun Habit.toDTO(): HabitDTO {
                 failed = failed,
                 enabled = enabled,
                 startFrom = startFrom,
-                streakName = h.streakName,
+                streakName = h.streakNames.takeIf { it.isNotEmpty() }?.toMap(),
             )
         }
 
@@ -60,7 +60,7 @@ data class SimpleHabitDTO(
         enabled = enabled,
         startFrom = startFrom,
         habitType = HabitType.SingleHabit(
-            streakName = streakName?.toMutableMap()
+            streakNames = streakName?.toList() ?: listOf()
         )
     )
 

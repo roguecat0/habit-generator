@@ -1,8 +1,61 @@
 package com.example.habitgenerator.services
 
+import android.util.Log
+
+const val TAG = "HabitService"
+
 class HabitService {
     fun changeHabitName(habit: Habit, name: String): Habit {
         return habit.copy(name = name)
+    }
+
+    fun addStreakName(habit: Habit): Habit {
+        return when (val type = habit.habitType) {
+            is HabitType.SingleHabit -> {
+                habit.copy(
+                    habitType = HabitType.SingleHabit(
+                        streakNames = type.streakNames + (0 to "")
+                    )
+                )
+            }
+
+            else -> habit
+        }
+    }
+
+
+    private fun changeHabitStreakAspect(
+        habit: Habit,
+        index: Int,
+        operation: (Pair<Int, String>) -> Pair<Int, String>
+    ): Habit {
+        Log.d(TAG, "changeHabitStreakAspect: $habit")
+        return when (val type = habit.habitType) {
+            is HabitType.SingleHabit -> {
+                habit.copy(
+                    habitType = HabitType.SingleHabit(streakNames = type.streakNames.mapIndexed { i, pair ->
+                        if (i == index) {
+                            operation(pair)
+                        } else {
+                            pair
+                        }
+                    })
+                )
+            }
+
+            else -> habit
+        }
+
+    }
+
+    fun changeHabitStreakName(habit: Habit, name: String, index: Int): Habit {
+        return changeHabitStreakAspect(habit, index) { pair -> pair.first to name }
+    }
+
+    fun changeHabitStreakValue(habit: Habit, streakStart: String, index: Int): Habit {
+        val start = streakStart.toInt()
+        return changeHabitStreakAspect(habit, index) { pair -> start to pair.second }
+
     }
 
     fun changeHabitStartFrom(habit: Habit, startFrom: String): Habit {

@@ -1,5 +1,6 @@
 package com.example.habitgenerator.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.habitgenerator.services.Habit
 import com.example.habitgenerator.services.HabitType
-import kotlin.math.exp
 
 @Composable
 fun EditHabit(
@@ -89,7 +90,10 @@ fun EditHabit(
             }
         }
         if (expanded) {
-            SingleHabitPart(habit, onEvent)
+            when (val habitType = habit.habitType) {
+                is HabitType.SingleHabit -> SingleHabitPart(habit, onEvent, habitType)
+                else -> {}
+            }
         }
     }
 }
@@ -98,9 +102,7 @@ fun EditHabit(
 fun SingleHabitPart(
     habit: Habit,
     onEvent: (EditHabitListEvent) -> Unit,
-    singlePart: HabitType.SingleHabit = HabitType.SingleHabit(
-        hashMapOf(Pair(3, "first"))
-    )
+    singlePart: HabitType.SingleHabit
 ) {
     Column {
         Row(
@@ -128,28 +130,44 @@ fun SingleHabitPart(
                 )
             }
         }
-        singlePart.streakName?.let { streakNames ->
-            for (pair in streakNames.toList()) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = pair.second,
-                        onValueChange = {},
-                        label = { Text("name") }
-                    )
-                    OutlinedTextField(
-                        value = pair.first.toString(),
-                        onValueChange = {},
-                        label = { Text("start from") }
-                    )
-                }
-
+        for ((i, pair) in singlePart.streakNames.withIndex()) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            ) {
+                OutlinedTextField(
+                    value = pair.second,
+                    onValueChange = {
+                        onEvent(
+                            EditHabitListEvent.ChangeHabitStreakName(
+                                it, habit.id, i
+                            )
+                        )
+                    },
+                    label = { Text("name") }
+                )
+                OutlinedTextField(
+                    value = if (pair.first == 0) {
+                        ""
+                    } else {
+                        pair.first.toString()
+                    },
+                    onValueChange = {
+                        onEvent(EditHabitListEvent.ChangeHabitStreakValue(it, habit.id, i))
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    label = { Text("start from") }
+                )
             }
+        }
+        IconButton(onClick = { onEvent(EditHabitListEvent.AddHabitStreakName(habit.id)) }) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = ""
+            )
         }
     }
 }

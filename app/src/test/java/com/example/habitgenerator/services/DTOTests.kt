@@ -92,7 +92,7 @@ class HabitDTOTest {
         val habit = Habit(
             0, "yolo", false, 3,
             completed = true, failed = true, habitType = HabitType.SingleHabit(
-                mutableMapOf(3 to "lol")
+                listOf(3 to "lol")
             )
         )
         val habit2 = dto.toHabit()
@@ -108,7 +108,7 @@ class HabitDTOTest {
         val habit = Habit(
             0, "yolo", false, 3,
             completed = true, failed = true, habitType = HabitType.SingleHabit(
-                mutableMapOf(3 to "lol")
+                listOf(3 to "lol")
             )
         )
         val dto2 = habit.toDTO()

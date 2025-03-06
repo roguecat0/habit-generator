@@ -12,7 +12,7 @@ data class Habit(
 
 sealed interface HabitType {
     data class SingleHabit(
-        val streakName: MutableMap<Int, String>? = null,
+        val streakNames: List<Pair<Int, String>> = listOf(),
     ) : HabitType
 
     data class Scheduled(
