@@ -18,6 +18,20 @@ sealed interface EditHabitListEvent {
         EditHabitListEvent
 
     data class AddHabitStreakName(val id: Int) : EditHabitListEvent
+    data class AddWeekScheduledHabit(val id: Int) : EditHabitListEvent
+    data class DeleteScheduledHabit(val id: Int, val index: Int) : EditHabitListEvent
+    data class ToggleScheduledHabitEnabled(val id: Int, val index: Int) : EditHabitListEvent
+    data class ToggleWeekdayEnabled(val id: Int, val scheduledIndex: Int, val weekdayIndex: Int) :
+        EditHabitListEvent
+
+    data class ChangeScheduledHabitName(val id: Int, val index: Int, val name: String) :
+        EditHabitListEvent
+
+    data class ChangeIntervalAmount(val id: Int, val index: Int, val interval: String) :
+        EditHabitListEvent
+
+    data class AddIntervalScheduledHabit(val id: Int) : EditHabitListEvent
+    data class RotateHabitType(val id: Int) : EditHabitListEvent
     data class ToggleHabitEnabled(val id: Int) : EditHabitListEvent
     data class ToggleHabitExpanded(val id: Int) : EditHabitListEvent
     data class DeleteHabit(val id: Int) : EditHabitListEvent

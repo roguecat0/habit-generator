@@ -1,10 +1,6 @@
 package com.example.habitgenerator.presentation
 
-import android.content.ClipData
-import android.content.Context
 import android.util.Log
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.habitgenerator.services.Habit
@@ -71,8 +67,83 @@ class EditHabitListViewModel(
             is EditHabitListEvent.ParseFromClipboard -> {
                 parseFromHabitsFromClipboard(event.getStringFromClip)
             }
+
+            is EditHabitListEvent.RotateHabitType -> {
+                rotateHabitType(event.id)
+            }
+
+            is EditHabitListEvent.AddWeekScheduledHabit -> {
+                addWeekHabit(event.id)
+            }
+
+            is EditHabitListEvent.AddIntervalScheduledHabit -> {
+                addIntervalHabit(event.id)
+            }
+
+            is EditHabitListEvent.ToggleScheduledHabitEnabled -> {
+                toggleScheduledHabitEnabled(event.id, event.index)
+            }
+
+            is EditHabitListEvent.DeleteScheduledHabit -> {
+                deleteScheduledHabit(event.id, event.index)
+            }
+
+            is EditHabitListEvent.ChangeScheduledHabitName -> {
+                changeScheduledHabitName(event.id, event.index, event.name)
+            }
+
+            is EditHabitListEvent.ToggleWeekdayEnabled -> {
+                toggleWeekdayEnabled(event.id, event.scheduledIndex, event.weekdayIndex)
+            }
+
+            is EditHabitListEvent.ChangeIntervalAmount -> {
+                changeIntervalAmount(event.id, event.index, event.interval)
+
+            }
         }
         Log.d(TAG, "onEvent: ${_state.value}")
+    }
+
+    private fun changeIntervalAmount(id: Int, index: Int, interval: String) {
+        changeAHabitValue(id = id) {
+            habitService.changeIntervalAmount(it, index, interval)
+        }
+    }
+
+    private fun toggleWeekdayEnabled(id: Int, scheduledIndex: Int, weekdayIndex: Int) {
+        changeAHabitValue(id = id) {
+            habitService.toggleWeekdayEnabled(it, scheduledIndex, weekdayIndex)
+        }
+    }
+
+    private fun changeScheduledHabitName(id: Int, index: Int, name: String) {
+        changeAHabitValue(id = id) {
+            habitService.changeScheduledHabitName(it, index, name)
+        }
+    }
+
+    private fun toggleScheduledHabitEnabled(id: Int, index: Int) {
+        changeAHabitValue(id = id) {
+            habitService.toggleScheduledHabitEnabled(it, index)
+        }
+    }
+
+    private fun deleteScheduledHabit(id: Int, index: Int) {
+        changeAHabitValue(id = id) {
+            habitService.deleteScheduledHabit(it, index)
+        }
+    }
+
+    private fun addWeekHabit(id: Int) {
+        changeAHabitValue(id = id) {
+            habitService.addScheduledWeek(it)
+        }
+    }
+
+    private fun addIntervalHabit(id: Int) {
+        changeAHabitValue(id) {
+            habitService.addScheduledInterval(it)
+        }
     }
 
     private fun deleteHabit(id: Int) {
@@ -92,6 +163,12 @@ class EditHabitListViewModel(
     private fun changeHabitStartFrom(startFrom: String, id: Int) {
         changeAHabitValue(id = id) {
             habitService.changeHabitStartFrom(it, startFrom)
+        }
+    }
+
+    private fun rotateHabitType(id: Int) {
+        changeAHabitValue(id = id) {
+            habitService.rotateType(it)
         }
     }
 

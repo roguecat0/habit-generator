@@ -10,6 +10,114 @@ class HabitService {
         return habit.copy(name = name)
     }
 
+    fun addScheduledWeek(habit: Habit): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
+                    scheduledType = ScheduledType.Weekdays()
+                )
+            )
+        }
+    }
+
+    fun addScheduledInterval(habit: Habit): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
+                    scheduledType = ScheduledType.Interval()
+                )
+            )
+        }
+    }
+
+    fun toggleScheduledHabitEnabled(habit: Habit, index: Int): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits.mapIndexed { i, scheduledHabit ->
+                    if (i == index) {
+                        scheduledHabit.copy(enabled = !scheduledHabit.enabled)
+                    } else {
+                        scheduledHabit
+                    }
+                }
+            )
+        }
+    }
+
+    fun changeIntervalAmount(habit: Habit, scheduledIndex: Int, interval: String): Habit {
+        val amount = interval.toIntOrNull() ?: 0
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits.mapIndexed { i, scheduledHabit ->
+                    scheduledHabit.takeIf { i != scheduledIndex } ?: scheduledHabit.copy(
+                        scheduledType = when (val type = scheduledHabit.scheduledType) {
+                            is ScheduledType.Interval -> type.copy(intervalDays = amount)
+                            else -> type
+                        }
+
+                    )
+                }
+            )
+        }
+    }
+
+    fun toggleWeekdayEnabled(habit: Habit, scheduledIndex: Int, weekdayIndex: Int): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits.mapIndexed { i, scheduledHabit ->
+                    scheduledHabit.takeIf { i != scheduledIndex } ?: scheduledHabit.copy(
+                        scheduledType = when (val type = scheduledHabit.scheduledType) {
+                            is ScheduledType.Weekdays -> {
+                                type.copy(activeDays = type.activeDays.mapIndexed { i, bool ->
+                                    bool.takeIf { i != weekdayIndex } ?: !bool
+                                })
+
+                            }
+
+                            else -> type
+                        }
+
+                    )
+                }
+            )
+        }
+    }
+
+    fun changeScheduledHabitName(habit: Habit, index: Int, name: String): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits.mapIndexed { i, scheduledHabit ->
+                    scheduledHabit.takeIf { i != index } ?: scheduledHabit.copy(
+                        name = name
+                    )
+                }
+            )
+        }
+    }
+
+    fun deleteScheduledHabit(habit: Habit, index: Int): Habit {
+        return changeScheduleValue(habit) { scheduled ->
+            scheduled.copy(
+                scheduledHabits = scheduled.scheduledHabits.filterIndexed { i, _ ->
+                    i != index
+                }
+            )
+        }
+    }
+
+    fun changeScheduleValue(
+        habit: Habit,
+        operation: (HabitType.Scheduled) -> HabitType.Scheduled
+    ): Habit {
+        return habit.copy(
+            habitType = when (val type = habit.habitType) {
+                is HabitType.Scheduled -> operation(type)
+                else -> type
+            }
+        )
+    }
+
+
     fun addStreakName(habit: Habit): Habit {
         return when (val type = habit.habitType) {
             is HabitType.SingleHabit -> {
@@ -22,6 +130,15 @@ class HabitService {
 
             else -> habit
         }
+    }
+
+    fun rotateType(habit: Habit): Habit {
+        return habit.copy(
+            habitType = when (val type = habit.habitType) {
+                is HabitType.SingleHabit -> HabitType.Scheduled()
+                else -> HabitType.SingleHabit()
+            }
+        )
     }
 
     fun deleteHabitStreak(

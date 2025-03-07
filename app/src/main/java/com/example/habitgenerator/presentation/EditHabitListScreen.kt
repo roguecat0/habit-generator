@@ -61,6 +61,9 @@ fun EditHabitListScreen(
             items(state.habits) {
                 EditHabit(habit = it.first, expanded = it.second, onEvent)
             }
+            item {
+                Spacer(Modifier.height(300.dp))
+            }
         }
 
     }

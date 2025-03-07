@@ -64,7 +64,9 @@ fun EditHabit(
             }
             CircleShape(
                 symbol,
-                modifier = Modifier.clickable { /* TODO */ }
+                modifier = Modifier.clickable {
+                    onEvent(EditHabitListEvent.RotateHabitType(habit.id))
+                }
             )
             Spacer(Modifier.width(8.dp))
             OutlinedTextField(
@@ -224,12 +226,6 @@ fun ScheduledHabitPart(
 ) {
     Column {
         for ((i, scheduled) in scheduledPart.scheduledHabits.withIndex()) {
-//            HorizontalDivider(
-//                thickness = 1.dp,
-//                color = MaterialTheme.colorScheme.surfaceContainer,
-//                modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
-//
-//            )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -241,7 +237,12 @@ fun ScheduledHabitPart(
             ) {
                 OutlinedTextField(
                     value = scheduled.name,
-                    onValueChange = { /* TODO */ },
+                    onValueChange = {
+                        onEvent(
+                            EditHabitListEvent
+                                .ChangeScheduledHabitName(habit.id, i, it)
+                        )
+                    },
                     label = { Text("scheduled name") },
                     modifier = Modifier.fillMaxWidth(fraction = 0.6f)
                 )
@@ -253,9 +254,23 @@ fun ScheduledHabitPart(
                 ) {
                     Checkbox(
                         checked = scheduled.enabled,
-                        onCheckedChange = { /* TODO */ }
+                        onCheckedChange = {
+                            onEvent(
+                                EditHabitListEvent.ToggleScheduledHabitEnabled(
+                                    id = habit.id,
+                                    index = i,
+                                )
+                            )
+                        }
                     )
-                    IconButton(onClick = { /* TODO */ }) {
+                    IconButton(onClick = {
+                        onEvent(
+                            EditHabitListEvent.DeleteScheduledHabit(
+                                id = habit.id,
+                                index = i,
+                            )
+                        )
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = ""
@@ -265,26 +280,44 @@ fun ScheduledHabitPart(
             }
             when (val scheduledType = scheduled.scheduledType) {
                 is ScheduledType.Weekdays -> {
-                    WeekdaysRow(habit, scheduledType, i)
+                    WeekdaysRow(habit, scheduledType, i, onEvent)
                 }
 
                 is ScheduledType.Interval -> {
-                    IntervalRow(habit, scheduledType, i)
+                    IntervalRow(habit, scheduledType, i, onEvent)
                 }
             }
         }
-        Box(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier.fillMaxWidth()
+                onClick = { onEvent(EditHabitListEvent.AddWeekScheduledHabit(habit.id)) },
+                modifier = Modifier.fillMaxWidth(.3f)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = ""
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Weekdays")
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = ""
+                    )
+                }
+            }
+            IconButton(
+                onClick = {
+                    onEvent(EditHabitListEvent.AddIntervalScheduledHabit(habit.id))
+                },
+                modifier = Modifier.fillMaxWidth(.3f)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("Interval")
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = ""
+                    )
+                }
             }
         }
     }
@@ -294,11 +327,14 @@ fun ScheduledHabitPart(
 fun IntervalRow(
     habit: Habit,
     interval: ScheduledType.Interval,
-    scheduledIndex: Int
+    scheduledIndex: Int,
+    onEvent: (EditHabitListEvent) -> Unit
 ) {
     Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp)
     ) {
         OutlinedTextField(
             value = if (interval.intervalDays == 0) {
@@ -306,10 +342,16 @@ fun IntervalRow(
             } else {
                 interval.intervalDays.toString()
             },
-            onValueChange = { /* TODO */ },
+            onValueChange = {
+                onEvent(
+                    EditHabitListEvent.ChangeIntervalAmount(
+                        habit.id, scheduledIndex, it
+                    )
+                )
+            },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text("interval") },
-            modifier = Modifier.fillMaxWidth(.4f)
+            modifier = Modifier.fillMaxWidth(.3f)
         )
     }
 
@@ -319,7 +361,8 @@ fun IntervalRow(
 fun WeekdaysRow(
     habit: Habit,
     weekdays: ScheduledType.Weekdays,
-    scheduledIndex: Int
+    scheduledIndex: Int,
+    onEvent: (EditHabitListEvent) -> Unit,
 ) {
     val labelWeekdays = listOf("mo", "tu", "we", "th", "fr", "sa", "su")
     Row(
@@ -331,7 +374,13 @@ fun WeekdaysRow(
         for ((i, weekday) in weekdays.activeDays.withIndex()) {
             FilterChip(
                 selected = weekday,
-                onClick = { /* TODO */ },
+                onClick = {
+                    onEvent(
+                        EditHabitListEvent.ToggleWeekdayEnabled(
+                            habit.id, scheduledIndex, i
+                        )
+                    )
+                },
                 label = { Text(labelWeekdays[i]) },
                 leadingIcon = {}
             )

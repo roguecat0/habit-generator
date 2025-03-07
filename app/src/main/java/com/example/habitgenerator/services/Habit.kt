@@ -40,8 +40,8 @@ data class ScheduledHabit(
 
 sealed interface ScheduledType {
     data class Weekdays(
-        val activeDays: Array<Boolean> =
-            arrayOf(false, false, false, false, false, false, false)
+        val activeDays: List<Boolean> =
+            listOf(false, false, false, false, false, false, false)
     ) : ScheduledType
 
     data class Interval(
