@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -72,7 +73,15 @@ fun MultiFab(
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val getStringFromClip = { clipboardManager.getText()?.text }
     Column(horizontalAlignment = Alignment.End, modifier = modifier) {
+        FloatingActionButton(onClick = {
+            onEvent(EditHabitListEvent.ParseFromClipboard(getStringFromClip))
+        }
+        ) {
+            Icon(Icons.Filled.Edit, contentDescription = "")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         FloatingActionButton(onClick = {
             onEvent(EditHabitListEvent.ParseHabits { json ->
                 clipboardManager.setText(AnnotatedString(json))

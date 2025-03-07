@@ -67,6 +67,10 @@ class EditHabitListViewModel(
             is EditHabitListEvent.ParseHabits -> {
                 parseHabitsToClipboard(event.clipboardCopy)
             }
+
+            is EditHabitListEvent.ParseFromClipboard -> {
+                parseFromHabitsFromClipboard(event.getStringFromClip)
+            }
         }
         Log.d(TAG, "onEvent: ${_state.value}")
     }
@@ -158,5 +162,13 @@ class EditHabitListViewModel(
         clipboardCopy(json)
     }
 
+    private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {
+        getStringFromClip()?.let { json ->
+            val habits = habitService.parseHabitsFromJson(json)
+            _state.value = EditHabitListState(
+                habits = habits.zip(habits.map { false })
+            )
+        }
+    }
 
 }

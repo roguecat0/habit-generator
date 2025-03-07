@@ -91,10 +91,7 @@ fun EditHabit(
             }
         }
         if (expanded) {
-            when (val habitType = habit.habitType) {
-                is HabitType.SingleHabit -> SingleHabitPart(habit, onEvent, habitType)
-                else -> {}
-            }
+            ExpandedPart(habit, onEvent)
         }
     }
 }
@@ -106,31 +103,6 @@ fun SingleHabitPart(
     singlePart: HabitType.SingleHabit
 ) {
     Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .fillMaxWidth()
-        ) {
-
-            OutlinedTextField(
-                value = if (habit.startFrom == 0) {
-                    ""
-                } else {
-                    habit.startFrom.toString()
-                },
-                onValueChange = { onEvent(EditHabitListEvent.ChangeHabitStartFrom(it, habit.id)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                label = { Text("start from") }
-            )
-            IconButton(onClick = { onEvent(EditHabitListEvent.DeleteHabit(habit.id)) }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = ""
-                )
-            }
-        }
         for ((i, pair) in singlePart.streakNames.withIndex()) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -192,6 +164,54 @@ fun SingleHabitPart(
 
         }
     }
+
+}
+
+@Composable
+fun ExpandedPart(
+    habit: Habit,
+    onEvent: (EditHabitListEvent) -> Unit,
+) {
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth()
+        ) {
+
+            OutlinedTextField(
+                value = if (habit.startFrom == 0) {
+                    ""
+                } else {
+                    habit.startFrom.toString()
+                },
+                onValueChange = { onEvent(EditHabitListEvent.ChangeHabitStartFrom(it, habit.id)) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = { Text("start from") }
+            )
+            IconButton(onClick = { onEvent(EditHabitListEvent.DeleteHabit(habit.id)) }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = ""
+                )
+            }
+        }
+        when (val habitType = habit.habitType) {
+            is HabitType.SingleHabit -> SingleHabitPart(habit, onEvent, habitType)
+            else -> {}
+        }
+    }
+}
+
+@Composable
+fun ScheduledHabitPart(
+    habit: Habit,
+    onEvent: (EditHabitListEvent) -> Unit,
+    scheduledPart: HabitType.Scheduled
+) {
+
 }
 
 @Preview

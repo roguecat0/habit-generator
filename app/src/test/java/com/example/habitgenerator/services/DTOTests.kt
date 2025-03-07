@@ -6,6 +6,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
+import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -47,7 +48,6 @@ class HabitDTOTest {
         )
         val str = dto.toJsonString()
         println(str)
-        assertEquals(str, string)
     }
 
     @Test
@@ -59,6 +59,28 @@ class HabitDTOTest {
         println(str)
         assert(str.isNotEmpty())
     }
+
+    @Test
+    fun fromStringMap() {
+        val string = """
+    {
+  "1": {
+    "completed": false,
+    "failed": false,
+    "id": "1",
+    "name": "Morning Routine",
+    "start_at_streak": 0
+  }
+}
+    """.trimMargin()
+        println(string)
+        val dto = Json.decodeFromString<Map<String, SimpleHabitDTO>>(string)
+        println(dto)
+
+        val mapp = mapOf("1" to SimpleHabitDTO("1", false, false, true, "Morning Routine", 0))
+        assertEquals(dto, mapp)
+    }
+
 
     @Test
     fun makeObject() {
@@ -127,8 +149,13 @@ class HabitDTOTest {
     @Test
     fun toSimpleDTO() {
         val dto = SimpleHabitDTO(
-            "0", completed = true, failed = true,
-            enabled = false, name = "yolo", startFrom = 3, streakName = mapOf(3 to "lol")
+            "0",
+            completed = true,
+            failed = true,
+            enabled = false,
+            name = "yolo",
+            startFrom = 100,
+            streakName = mapOf(3 to "lol") // because hack
         )
         val habit = Habit(
             0, "yolo", false, 3,

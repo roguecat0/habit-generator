@@ -25,4 +25,5 @@ sealed interface EditHabitListEvent {
 
     data object NewHabit : EditHabitListEvent
     data class ParseHabits(val clipboardCopy: (String) -> Unit) : EditHabitListEvent
+    data class ParseFromClipboard(val getStringFromClip: () -> String?) : EditHabitListEvent
 }

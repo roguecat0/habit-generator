@@ -1,6 +1,7 @@
 package com.example.habitgenerator.services
 
 import android.util.Log
+import kotlinx.serialization.json.Json
 
 const val TAG = "HabitService"
 
@@ -103,5 +104,10 @@ class HabitService {
     fun parseHabitsToJson(habits: List<Habit>): String {
         return habits.map { it.toDTO() }.let { Log.d(TAG, "parseHabitsToJson: $it");it }
             .toTamaCompatString()
+    }
+
+    fun parseHabitsFromJson(json: String): List<Habit> {
+        // this is naive for one variation. to all first parse to json element and check for sign
+        return Json.decodeFromString<Map<String, SimpleHabitDTO>>(json).values.map { it.toHabit() }
     }
 }

@@ -33,8 +33,9 @@ data class ScheduledHabit(
     val id: Int,
     val name: String,
     val completed: Boolean,
-    val failed: Boolean,
+    val enabled: Boolean,
     val parent: Int,
+    val scheduledType: ScheduledType,
 )
 
 sealed interface ScheduledType {

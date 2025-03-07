@@ -28,7 +28,7 @@ fun Habit.toDTO(): HabitDTO {
                 completed = completed,
                 failed = failed,
                 enabled = enabled,
-                startFrom = if (!enabled) 100 else startFrom,
+                startFrom = if (!enabled) startFrom + 100 else startFrom,
                 streakName = h.streakNames.takeIf { it.isNotEmpty() }?.toMap(),
             )
         }
@@ -67,7 +67,7 @@ data class SimpleHabitDTO @OptIn(ExperimentalSerializationApi::class) constructo
         // dirty quick fix
         // todo: make normal better enabled functionality in other app
         enabled = if (startFrom >= 100) false else enabled,
-        startFrom = startFrom,
+        startFrom = if (startFrom >= 100) startFrom - 100 else startFrom,
         habitType = HabitType.SingleHabit(
             streakNames = streakName?.toList() ?: listOf()
         )
