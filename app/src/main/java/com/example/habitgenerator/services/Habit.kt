@@ -30,11 +30,11 @@ data class PlannedHabit(
 )
 
 data class ScheduledHabit(
-    val id: Int,
-    val name: String,
-    val completed: Boolean,
-    val enabled: Boolean,
-    val parent: Int,
+    val id: Int = 0,
+    val name: String = "",
+    val completed: Boolean = true,
+    val enabled: Boolean = true,
+    val parent: Int = -1,
     val scheduledType: ScheduledType,
 )
 
@@ -45,13 +45,13 @@ sealed interface ScheduledType {
     ) : ScheduledType
 
     data class Interval(
-        val intervalDays: Int,
-        val lastCompletedDate: SimpleDate
+        val intervalDays: Int = 0,
+        val lastCompletedDate: SimpleDate = SimpleDate()
     ) : ScheduledType
 }
 
 data class SimpleDate(
-    val day: Int,
-    val month: Int,
-    val year: Int,
+    val day: Int = 1,
+    val month: Int = 1,
+    val year: Int = 2000,
 )
