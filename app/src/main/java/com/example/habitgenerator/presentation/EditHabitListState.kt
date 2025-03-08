@@ -1,9 +1,11 @@
 package com.example.habitgenerator.presentation
 
 import com.example.habitgenerator.services.Habit
+import kotlinx.serialization.json.JsonElement
 
 data class EditHabitListState(
-    val habits: List<Pair<Habit, Boolean>> = emptyList()
+    val habits: List<Pair<Habit, Boolean>> = emptyList(),
+    val specials: List<JsonElement> = emptyList(),
 )
 
 sealed interface EditHabitListEvent {

@@ -1,7 +1,14 @@
 package com.example.habitgenerator.services
 
-import android.util.Log
+import com.example.habitgenerator.services.dto.HabitDTO
+import com.example.habitgenerator.services.dto.SingleHabitDTO
+import com.example.habitgenerator.services.dto.toDTO
+import com.example.habitgenerator.services.dto.toTamaCompatString
+import com.example.habitgenerator.services.dto.toTamaCompatStringWithSpecials
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 
 const val TAG = "HabitService"
 
@@ -219,12 +226,88 @@ class HabitService {
     }
 
     fun parseHabitsToJson(habits: List<Habit>): String {
-        return habits.map { it.toDTO() }.let { Log.d(TAG, "parseHabitsToJson: $it");it }
-            .toTamaCompatString()
+        return habits.map { it.toDTO() }.toTamaCompatString()
+    }
+
+    fun parseHabitsToJsonWithSpecials(habits: List<Habit>, specials: List<JsonElement>): String {
+        return habits.map { it.toDTO() }.toTamaCompatStringWithSpecials(specials)
     }
 
     fun parseHabitsFromJson(json: String): List<Habit> {
         // this is naive for one variation. to all first parse to json element and check for sign
-        return Json.decodeFromString<Map<String, SimpleHabitDTO>>(json).values.map { it.toHabit() }
+        return Json.decodeFromString<Map<String, SingleHabitDTO>>(json).values.map { it.toHabit() }
     }
+
+    fun parseHabitsFromJsonWithJsonAddition(json: String): Pair<List<Habit>, List<JsonElement>> {
+        val jsonHabits: JsonElement = Json.decodeFromString(json)
+        val specialHabits: MutableList<JsonElement> = mutableListOf()
+        val singleHabits: MutableList<SingleHabitDTO> = mutableListOf()
+        for (j in jsonHabits.jsonObject.values) {
+            if (
+                j.jsonObject["scheduled_tasks"] != null ||
+                j.jsonObject["planned_task"] != null
+            ) {
+                println(j)
+                specialHabits.add(j)
+            } else {
+                singleHabits.add(Json.decodeFromJsonElement(j))
+            }
+        }
+        return singleHabits.map { it.toHabit() }.toList() to specialHabits.toList()
+    }
+}
+
+fun main() {
+    val string = """
+       {
+  "1": {
+    "completed": false,
+    "failed": false,
+    "id": "1",
+    "name": "Daily Goal",
+    "planned_task": [
+      { "day": 4, "month": 3, "tasks": ["hun", ""], "year": 2025 },
+      { "day": 5, "month": 3, "tasks": ["innk"], "year": 2025 }
+    ],
+    "start_at_streak": 0
+  },
+  "2": {
+    "completed": false,
+    "failed": false,
+    "id": "2",
+    "name": "habits",
+    "scheduled_tasks": [
+      {
+        "completed": false,
+        "enabled": false,
+        "id": "2",
+        "name": "One Approach",
+        "parent": "e",
+        "weekdays": [1, 2, 3]
+      },
+      {
+        "completed": false,
+        "enabled": true,
+        "id": "2",
+        "name": "medicine",
+        "parent": "e",
+        "weekdays": [3]
+      }
+    ],
+    "start_at_streak": 0
+  },
+  "3": {
+    "completed": false,
+    "failed": false,
+    "id": "3",
+    "name": "Sleep before 1h",
+    "start_at_streak": 3,
+    "streak_name": { "6": "Sleep before 12h" }
+  }
+} 
+    """.trimIndent()
+    val (habits, specials) = HabitService().parseHabitsFromJsonWithJsonAddition(string)
+    val s2 = HabitService().parseHabitsToJsonWithSpecials(habits, specials)
+    println(s2)
+
 }
