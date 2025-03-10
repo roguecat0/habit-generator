@@ -1,14 +1,14 @@
 package com.example.habitgenerator.services
 
-import com.example.habitgenerator.services.dto.HabitDTO
-import com.example.habitgenerator.services.dto.SingleHabitDTO
+import com.example.habitgenerator.services.dto.HabitDTO2
+import com.example.habitgenerator.services.dto.SingleHabitDTO2
 import com.example.habitgenerator.services.dto.toDTO
 import com.example.habitgenerator.services.dto.toTamaCompatString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Test
 
-class HabitDTOTest {
+class HabitDTO2Test {
     @Test
     fun init() {
         assertEquals(0, 0)
@@ -16,7 +16,7 @@ class HabitDTOTest {
 
     @Test
     fun makesString() {
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "3", true, false, true, "lol", 3
         )
         val str = dto.toJsonString()
@@ -28,7 +28,7 @@ class HabitDTOTest {
     fun makesString2() {
         val string =
             """{"id":"3","completed":true,"failed":false,"name":"lol","start_at_streak":3}"""
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "3", true, false, true, "lol", 3
         )
         val str = dto.toJsonString()
@@ -41,7 +41,7 @@ class HabitDTOTest {
         val string =
             """ { "completed": false, "enabled": false, "failed": false, "id": "1", "name": "Morning Routine", "start_at_streak": 0 }
             """.trimIndent()
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "1", true, false, true, "Morning Routine", 1
         )
         val str = dto.toJsonString()
@@ -50,7 +50,7 @@ class HabitDTOTest {
 
     @Test
     fun fromString() {
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "3", true, false, true, "lol", 3
         )
         val str = dto.toJsonString()
@@ -72,10 +72,10 @@ class HabitDTOTest {
 }
     """.trimMargin()
         println(string)
-        val dto = Json.decodeFromString<Map<String, SingleHabitDTO>>(string)
+        val dto = Json.decodeFromString<Map<String, SingleHabitDTO2>>(string)
         println(dto)
 
-        val mapp = mapOf("1" to SingleHabitDTO("1", false, false, true, "Morning Routine", 0))
+        val mapp = mapOf("1" to SingleHabitDTO2("1", false, false, true, "Morning Routine", 0))
         assertEquals(dto, mapp)
     }
 
@@ -84,10 +84,10 @@ class HabitDTOTest {
     fun makeObject() {
         val string =
             "{\"id\":\"3\",\"completed\":true,\"failed\":false,\"name\":\"lol\",\"start_at_streak\":3}"
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "3", true, false, true, "lol", 3
         )
-        assertEquals(SingleHabitDTO.Companion.fromJson(string), dto)
+        assertEquals(SingleHabitDTO2.Companion.fromJson(string), dto)
     }
 
     @Test
@@ -101,22 +101,22 @@ class HabitDTOTest {
                 "name":"lol"
                 }
             """.trimMargin()
-        val dto: HabitDTO = SingleHabitDTO(
+        val dto: HabitDTO2 = SingleHabitDTO2(
             "3", true, false, true, "lol",
         )
-        assertEquals(SingleHabitDTO.fromJson(string), dto)
+        assertEquals(SingleHabitDTO2.fromJson(string), dto)
     }
 
     @Test
     fun MultiPart() {
-        val list: List<HabitDTO> = listOf(
-            SingleHabitDTO(
+        val list: List<HabitDTO2> = listOf(
+            SingleHabitDTO2(
                 "3", true, false, true, "lol",
             ),
-            SingleHabitDTO(
+            SingleHabitDTO2(
                 "2", true, false, true, "later", startFrom = 4
             ),
-            SingleHabitDTO(
+            SingleHabitDTO2(
                 "8", true, false, true, "lol", streakNames = mapOf(
                     3 to "cool",
                     2 to "spectacular"
@@ -130,7 +130,7 @@ class HabitDTOTest {
 
     @Test
     fun toHabit() {
-        val dto = SingleHabitDTO(
+        val dto = SingleHabitDTO2(
             "0", completed = true, failed = true,
             enabled = false, name = "yolo", startFrom = 3, streakNames = mapOf(3 to "lol")
         )
@@ -146,7 +146,7 @@ class HabitDTOTest {
 
     @Test
     fun toSimpleDTO() {
-        val dto = SingleHabitDTO(
+        val dto = SingleHabitDTO2(
             "0",
             completed = true,
             failed = true,

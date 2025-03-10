@@ -13,7 +13,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
 @Serializable
-data class SingleHabitDTO @OptIn(ExperimentalSerializationApi::class) constructor(
+data class SingleHabitDTO2 @OptIn(ExperimentalSerializationApi::class) constructor(
     val id: String,
     val completed: Boolean,
     val failed: Boolean,
@@ -25,10 +25,10 @@ data class SingleHabitDTO @OptIn(ExperimentalSerializationApi::class) constructo
     val startFrom: Int = 0,
     @SerialName("streak_name")
     val streakNames: Map<Int, String>? = null,
-) : HabitDTO {
+) : HabitDTO2 {
 
     companion object {
-        fun fromJson(json: String): SingleHabitDTO {
+        fun fromJson(json: String): SingleHabitDTO2 {
             return Json.decodeFromString(json)
         }
     }

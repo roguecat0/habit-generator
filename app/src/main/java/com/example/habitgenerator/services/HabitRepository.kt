@@ -1,7 +1,6 @@
 package com.example.habitgenerator.services
 
-import com.example.habitgenerator.services.dto.HabitDTO
-import com.example.habitgenerator.services.dto.SingleHabitDTO
+import com.example.habitgenerator.services.dto.SingleHabitDTO2
 import com.example.habitgenerator.services.dto.toDTO
 import com.example.habitgenerator.services.dto.toTamaCompatString
 import com.example.habitgenerator.services.dto.toTamaCompatStringWithSpecials
@@ -10,9 +9,9 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 
-const val TAG = "HabitService"
+const val TAG = "HabitRepository"
 
-class HabitService {
+class HabitRepository {
     fun changeHabitName(habit: Habit, name: String): Habit {
         return habit.copy(name = name)
     }
@@ -235,13 +234,13 @@ class HabitService {
 
     fun parseHabitsFromJson(json: String): List<Habit> {
         // this is naive for one variation. to all first parse to json element and check for sign
-        return Json.decodeFromString<Map<String, SingleHabitDTO>>(json).values.map { it.toHabit() }
+        return Json.decodeFromString<Map<String, SingleHabitDTO2>>(json).values.map { it.toHabit() }
     }
 
     fun parseHabitsFromJsonWithJsonAddition(json: String): Pair<List<Habit>, List<JsonElement>> {
         val jsonHabits: JsonElement = Json.decodeFromString(json)
         val specialHabits: MutableList<JsonElement> = mutableListOf()
-        val singleHabits: MutableList<SingleHabitDTO> = mutableListOf()
+        val singleHabits: MutableList<SingleHabitDTO2> = mutableListOf()
         for (j in jsonHabits.jsonObject.values) {
             if (
                 j.jsonObject["scheduled_tasks"] != null ||
@@ -306,8 +305,8 @@ fun main() {
   }
 } 
     """.trimIndent()
-    val (habits, specials) = HabitService().parseHabitsFromJsonWithJsonAddition(string)
-    val s2 = HabitService().parseHabitsToJsonWithSpecials(habits, specials)
+    val (habits, specials) = HabitRepository().parseHabitsFromJsonWithJsonAddition(string)
+    val s2 = HabitRepository().parseHabitsToJsonWithSpecials(habits, specials)
     println(s2)
 
 }

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-data class ScheduledHabitHTO @OptIn(ExperimentalSerializationApi::class) constructor(
+data class ScheduledHabitDTO2 @OptIn(ExperimentalSerializationApi::class) constructor(
     val id: String,
     val completed: Boolean,
     val failed: Boolean,

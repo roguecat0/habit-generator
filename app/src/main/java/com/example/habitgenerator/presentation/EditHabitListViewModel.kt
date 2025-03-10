@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.habitgenerator.services.Habit
-import com.example.habitgenerator.services.HabitService
+import com.example.habitgenerator.services.HabitRepository
 import com.example.habitgenerator.services.util.splitPairs
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 const val TAG = "EditHabitListViewModel"
 
 class EditHabitListViewModel(
-    private val habitService: HabitService,
+    private val habitRepository: HabitRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _state = MutableStateFlow(EditHabitListState())
@@ -106,43 +106,43 @@ class EditHabitListViewModel(
 
     private fun changeIntervalAmount(id: Int, index: Int, interval: String) {
         changeAHabitValue(id = id) {
-            habitService.changeIntervalAmount(it, index, interval)
+            habitRepository.changeIntervalAmount(it, index, interval)
         }
     }
 
     private fun toggleWeekdayEnabled(id: Int, scheduledIndex: Int, weekdayIndex: Int) {
         changeAHabitValue(id = id) {
-            habitService.toggleWeekdayEnabled(it, scheduledIndex, weekdayIndex)
+            habitRepository.toggleWeekdayEnabled(it, scheduledIndex, weekdayIndex)
         }
     }
 
     private fun changeScheduledHabitName(id: Int, index: Int, name: String) {
         changeAHabitValue(id = id) {
-            habitService.changeScheduledHabitName(it, index, name)
+            habitRepository.changeScheduledHabitName(it, index, name)
         }
     }
 
     private fun toggleScheduledHabitEnabled(id: Int, index: Int) {
         changeAHabitValue(id = id) {
-            habitService.toggleScheduledHabitEnabled(it, index)
+            habitRepository.toggleScheduledHabitEnabled(it, index)
         }
     }
 
     private fun deleteScheduledHabit(id: Int, index: Int) {
         changeAHabitValue(id = id) {
-            habitService.deleteScheduledHabit(it, index)
+            habitRepository.deleteScheduledHabit(it, index)
         }
     }
 
     private fun addWeekHabit(id: Int) {
         changeAHabitValue(id = id) {
-            habitService.addScheduledWeek(it)
+            habitRepository.addScheduledWeek(it)
         }
     }
 
     private fun addIntervalHabit(id: Int) {
         changeAHabitValue(id) {
-            habitService.addScheduledInterval(it)
+            habitRepository.addScheduledInterval(it)
         }
     }
 
@@ -155,26 +155,26 @@ class EditHabitListViewModel(
 
     private fun deleteHabitStreak(id: Int, streakIndex: Int) {
         changeAHabitValue(id = id) {
-            habitService.deleteHabitStreak(it, streakIndex)
+            habitRepository.deleteHabitStreak(it, streakIndex)
         }
 
     }
 
     private fun changeHabitStartFrom(startFrom: String, id: Int) {
         changeAHabitValue(id = id) {
-            habitService.changeHabitStartFrom(it, startFrom)
+            habitRepository.changeHabitStartFrom(it, startFrom)
         }
     }
 
     private fun rotateHabitType(id: Int) {
         changeAHabitValue(id = id) {
-            habitService.rotateType(it)
+            habitRepository.rotateType(it)
         }
     }
 
     private fun changeAHabitValue(id: Int, operation: (Habit) -> Habit) {
         val (habits, expandedItems) = _state.value.habits.splitPairs()
-        val uiHabits = habitService
+        val uiHabits = habitRepository
             .mapHabitAtId(habits, id, operation)
             .zip(expandedItems)
         _state.value = _state.value.copy(habits = uiHabits)
@@ -182,31 +182,31 @@ class EditHabitListViewModel(
 
     private fun addHabitStreakName(id: Int) {
         changeAHabitValue(id = id) { habit ->
-            habitService.addStreakName(habit)
+            habitRepository.addStreakName(habit)
         }
     }
 
     private fun changeHabitName(name: String, id: Int) {
         changeAHabitValue(id = id) { habit ->
-            habitService.changeHabitName(habit, name)
+            habitRepository.changeHabitName(habit, name)
         }
     }
 
     private fun changeHabitStreakName(start: String, id: Int, index: Int) {
         changeAHabitValue(id = id) { habit ->
-            habitService.changeHabitStreakName(habit, start, index)
+            habitRepository.changeHabitStreakName(habit, start, index)
         }
     }
 
     private fun changeHabitStreakValue(start: String, id: Int, index: Int) {
         changeAHabitValue(id = id) { habit ->
-            habitService.changeHabitStreakValue(habit, start, index)
+            habitRepository.changeHabitStreakValue(habit, start, index)
         }
     }
 
     private fun toggleHabitEnabled(id: Int) {
         changeAHabitValue(id = id) { habit ->
-            habitService.toggleHabitEnabled(habit)
+            habitRepository.toggleHabitEnabled(habit)
         }
     }
 
@@ -225,7 +225,7 @@ class EditHabitListViewModel(
 
     private fun newHabit() {
         val (habits, _) = _state.value.habits.splitPairs()
-        val id = habitService.getNewId(habits)
+        val id = habitRepository.getNewId(habits)
         val newUiHabit = Habit(id = id) to false
         val inter = _state.value.habits + newUiHabit
         _state.value = _state.value
@@ -234,7 +234,7 @@ class EditHabitListViewModel(
 
     private fun parseHabitsToClipboard(clipboardCopy: (String) -> Unit) {
         val (habits, _) = _state.value.habits.splitPairs()
-        val json = habitService.parseHabitsToJsonWithSpecials(
+        val json = habitRepository.parseHabitsToJsonWithSpecials(
             habits,
             _state.value.specials
         )
@@ -244,7 +244,7 @@ class EditHabitListViewModel(
 
     private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {
         getStringFromClip()?.let { json ->
-            val (habits, specials) = habitService.parseHabitsFromJsonWithJsonAddition(json)
+            val (habits, specials) = habitRepository.parseHabitsFromJsonWithJsonAddition(json)
             _state.value = EditHabitListState(
                 habits = habits.zip(habits.map { false }),
                 specials = specials,
