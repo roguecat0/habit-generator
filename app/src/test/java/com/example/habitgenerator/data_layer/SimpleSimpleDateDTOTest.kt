@@ -1,10 +1,10 @@
-package com.example.habitgenerator.services
+package com.example.habitgenerator.data_layer
 
 import org.junit.Assert.*
 
 import org.junit.Test
 
-class SimpleDateTest {
+class SimpleSimpleDateDTOTest {
 
     @Test
     fun getDay() {

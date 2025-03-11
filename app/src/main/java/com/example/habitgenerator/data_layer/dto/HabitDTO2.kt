@@ -1,7 +1,7 @@
-package com.example.habitgenerator.services.dto
+package com.example.habitgenerator.data_layer.dto
 
-import com.example.habitgenerator.services.Habit
-import com.example.habitgenerator.services.HabitType
+import com.example.habitgenerator.data_layer.Habit
+import com.example.habitgenerator.data_layer.HabitType
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json

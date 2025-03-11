@@ -1,4 +1,4 @@
-package com.example.habitgenerator.services
+package com.example.habitgenerator.data_layer
 
 data class Habit(
     val id: Int = 0,

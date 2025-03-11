@@ -1,4 +1,4 @@
-package com.example.habitgenerator.services.dto
+package com.example.habitgenerator.data_layer.dto
 
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi

@@ -1,4 +1,4 @@
-package com.example.habitgenerator.services
+package com.example.habitgenerator.data_layer
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

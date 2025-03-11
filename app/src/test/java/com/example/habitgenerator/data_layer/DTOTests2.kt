@@ -1,9 +1,9 @@
-package com.example.habitgenerator.services
+package com.example.habitgenerator.data_layer
 
-import com.example.habitgenerator.services.dto.HabitDTO2
-import com.example.habitgenerator.services.dto.SingleHabitDTO2
-import com.example.habitgenerator.services.dto.toDTO
-import com.example.habitgenerator.services.dto.toTamaCompatString
+import com.example.habitgenerator.data_layer.dto.HabitDTO2
+import com.example.habitgenerator.data_layer.dto.SingleHabitDTO2
+import com.example.habitgenerator.data_layer.dto.toDTO
+import com.example.habitgenerator.data_layer.dto.toTamaCompatString
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Test

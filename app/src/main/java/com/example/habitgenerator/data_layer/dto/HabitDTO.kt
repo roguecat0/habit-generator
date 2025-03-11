@@ -1,10 +1,10 @@
-package com.example.habitgenerator.services.dto
+package com.example.habitgenerator.data_layer.dto
 
-import com.example.habitgenerator.services.Habit
-import com.example.habitgenerator.services.HabitType
-import com.example.habitgenerator.services.ScheduledHabit
-import com.example.habitgenerator.services.ScheduledType
-import com.example.habitgenerator.services.SimpleDate
+import com.example.habitgenerator.data_layer.Habit
+import com.example.habitgenerator.data_layer.HabitType
+import com.example.habitgenerator.data_layer.ScheduledHabit
+import com.example.habitgenerator.data_layer.ScheduledType
+import com.example.habitgenerator.data_layer.SimpleDate
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
@@ -81,7 +81,7 @@ fun ScheduledHabit.toScheduledHabitPartDTO(): ScheduledHabitPartDTO {
                 enabled = enabled,
                 parent = parent.toString(),
                 interval = type.intervalDays,
-                lastCompletedDay = IntervalHabitDTO.Date(
+                lastCompletedDay = SimpleDateDTO(
                     day = type.lastCompletedDate.day,
                     month = type.lastCompletedDate.month,
                     year = type.lastCompletedDate.year,
@@ -185,6 +185,19 @@ data class WeekdayHabitDTO(
 }
 
 @Serializable
+data class SimpleDateDTO(
+    val year: Int,
+    val month: Int,
+    val day: Int,
+) {
+    fun toSimpleDate(): SimpleDate = SimpleDate(
+        day = day,
+        month = month,
+        year = year,
+    )
+}
+
+@Serializable
 @SerialName("interval")
 data class IntervalHabitDTO(
     override val id: String,
@@ -193,22 +206,10 @@ data class IntervalHabitDTO(
     override val enabled: Boolean,
     override val parent: String,
     @SerialName("last_completed_day")
-    val lastCompletedDay: IntervalHabitDTO.Date,
+    val lastCompletedDay: SimpleDateDTO,
     val interval: Int
 ) : ScheduledHabitPartDTO() {
 
-    @Serializable
-    data class Date(
-        val year: Int,
-        val month: Int,
-        val day: Int,
-    ) {
-        fun toSimpleDate(): SimpleDate = SimpleDate(
-            day = day,
-            month = month,
-            year = year,
-        )
-    }
 
     override fun toScheduledHabit(): ScheduledHabit {
         return ScheduledHabit(
@@ -233,7 +234,7 @@ fun main() {
     )
     val intervalHabit: ScheduledHabitPartDTO = IntervalHabitDTO(
         "3", "first", true, true, "0",
-        IntervalHabitDTO.Date(0, 0, 0), interval = 1
+        SimpleDateDTO(0, 0, 0), interval = 1
 
     )
     val dto: HabitDTO = ScheduledHabitDTO(
