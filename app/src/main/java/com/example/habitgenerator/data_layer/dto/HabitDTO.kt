@@ -11,6 +11,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
+import kotlin.random.Random
 
 @Serializable
 sealed class HabitDTO {
@@ -88,106 +89,6 @@ fun ScheduledHabit.toScheduledHabitPartDTO(): ScheduledHabitPartDTO {
     }
 }
 
-@Serializable
-@SerialName("single_habit")
-data class SingleHabitDTO(
-    override val id: String,
-    override val completed: Boolean,
-    override val failed: Boolean,
-    @Transient
-    override val enabled: Boolean = true,
-    override val name: String,
-    @OptIn(ExperimentalSerializationApi::class)
-    @EncodeDefault
-    @SerialName("start_at_streak")
-    override val startFrom: Int,
-    @SerialName("streak_name")
-    val streakNames: Map<Int, String>? = null,
-) : HabitDTO() {
-    override fun toHabit(): Habit = Habit(
-        id = id.toInt(),
-        name = name,
-        completed = completed,
-        failed = failed,
-        // dirty quick fix
-        // todo: make normal better enabled functionality in other app
-        enabled = if (startFrom >= 100) false else enabled,
-        startFrom = if (startFrom >= 100) startFrom - 100 else startFrom,
-        habitType = HabitType.SingleHabit(
-            streakNames = streakNames?.toList() ?: listOf()
-        )
-    )
-}
-
-@Serializable
-@SerialName("scheduled_habit")
-data class ScheduledHabitDTO(
-    override val id: String,
-    override val completed: Boolean,
-    override val failed: Boolean,
-    @Transient
-    override val enabled: Boolean = true,
-    override val name: String,
-    @OptIn(ExperimentalSerializationApi::class)
-    @EncodeDefault
-    @SerialName("start_at_streak")
-    override val startFrom: Int,
-    @SerialName("scheduled_tasks")
-    val scheduledHabits: List<ScheduledHabitPartDTO>
-) : HabitDTO() {
-    override fun toHabit(): Habit = Habit(
-        id = id.toInt(),
-        name = name,
-        completed = completed,
-        failed = failed,
-        // dirty quick fix
-        // todo: make normal better enabled functionality in other app
-        enabled = if (startFrom >= 100) false else enabled,
-        startFrom = if (startFrom >= 100) startFrom - 100 else startFrom,
-        habitType = HabitType.Scheduled(
-            scheduledHabits = scheduledHabits.map { it.toScheduledHabit() }
-        )
-    )
-}
-
-@Serializable
-sealed class ScheduledHabitPartDTO {
-    abstract val id: String
-    abstract val name: String
-    abstract val completed: Boolean
-    abstract val enabled: Boolean
-    abstract val parent: String
-
-    abstract fun toScheduledHabit(): ScheduledHabit
-}
-
-@Serializable
-@SerialName("weekdays")
-data class WeekdayHabitDTO(
-    override val id: String,
-    override val name: String,
-    override val completed: Boolean,
-    override val enabled: Boolean,
-    override val parent: String,
-    val weekdays: List<Int>,
-) : ScheduledHabitPartDTO() {
-    override fun toScheduledHabit(): ScheduledHabit {
-        return ScheduledHabit(
-            id = this.id.toInt(),
-            name = this.name,
-            completed = this.completed,
-            enabled = this.enabled,
-            parent = this.parent.toInt(),
-            scheduledType = ScheduledType.Weekdays(
-                activeDays = parseActiveDays()
-            )
-        )
-    }
-
-    private fun parseActiveDays(): List<Boolean> {
-        return (0..6).map { i -> this.weekdays.contains(i) }
-    }
-}
 
 @Serializable
 data class SimpleDateDTO(
@@ -202,63 +103,6 @@ data class SimpleDateDTO(
         year = year,
     )
 }
-
-@Serializable
-@SerialName("interval")
-data class IntervalHabitDTO(
-    override val id: String,
-    override val name: String,
-    override val completed: Boolean,
-    override val enabled: Boolean,
-    override val parent: String,
-    @SerialName("last_completed_day")
-    val lastCompletedDay: SimpleDateDTO,
-    val interval: Int
-) : ScheduledHabitPartDTO() {
-
-
-    override fun toScheduledHabit(): ScheduledHabit {
-        return ScheduledHabit(
-            id = id.toInt(),
-            name = name,
-            completed = completed,
-            enabled = enabled,
-            parent = parent.toInt(),
-            scheduledType = ScheduledType.Interval(
-                intervalDays = interval,
-                lastCompletedDate = lastCompletedDay.toSimpleDate()
-            )
-        )
-    }
-
-}
-
-@Serializable
-@SerialName("planned_habit")
-data class PlannedHabitDTO(
-    override val id: String,
-    override val completed: Boolean,
-    override val failed: Boolean,
-    @Transient
-    override val enabled: Boolean = true,
-    override val name: String,
-    @OptIn(ExperimentalSerializationApi::class)
-    @EncodeDefault
-    @SerialName("start_at_streak")
-    override val startFrom: Int,
-    @SerialName("planned_task")
-    val plannedTasks: List<PlannedTasksDTO>,
-) : HabitDTO() {
-    override fun toHabit(): Habit {
-        TODO("Not yet implemented")
-    }
-}
-
-@Serializable
-data class PlannedTasksDTO(
-    val date: SimpleDateDTO,
-    val tasks: List<String>
-)
 
 
 fun main() {

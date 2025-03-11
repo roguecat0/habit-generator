@@ -2,12 +2,15 @@ package com.example.habitgenerator.data_layer
 
 import android.util.Log
 import com.example.habitgenerator.data_layer.dto.HabitDTO
+import com.example.habitgenerator.data_layer.dto.PlannedHabitDTO
 import com.example.habitgenerator.data_layer.dto.SingleHabitDTO2
 import com.example.habitgenerator.data_layer.dto.toDTO
+import com.example.habitgenerator.data_layer.dto.toHabitDTO
 import com.example.habitgenerator.data_layer.dto.toTamaCompatString
 import com.example.habitgenerator.data_layer.dto.toTamaCompatStringWithSpecials
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -18,7 +21,7 @@ const val TAG = "HabitRepository"
 
 class HabitRepository {
     private val json = Json { ignoreUnknownKeys = true }
-    private var specials: List<JsonElement> = emptyList()
+    private var specials: List<HabitDTO> = emptyList()
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits: StateFlow<List<Habit>> get() = _habits
     fun changeHabitName(habit: Habit, name: String): Habit {
@@ -234,7 +237,11 @@ class HabitRepository {
         return habit.copy(enabled = !habit.enabled)
     }
 
-    fun mapHabitAtId(habits: List<Habit>, id: Int, operation: (Habit) -> Habit): List<Habit> {
+    private fun mapHabitAtId(
+        habits: List<Habit>,
+        id: Int,
+        operation: (Habit) -> Habit
+    ): List<Habit> {
         return habits.map { habit ->
             if (id == habit.id) {
                 operation(habit)
@@ -245,19 +252,22 @@ class HabitRepository {
     }
 
 
-    fun getNewId(habits: List<Habit>): Int {
+    private fun getNewId(habits: List<Habit>): Int {
         return (habits.maxByOrNull { it.id }?.id ?: 0) + 1
     }
 
-    fun parseHabitsToJson(habits: List<Habit>): String {
-        return habits.map { it.toDTO() }.toTamaCompatString()
+    private fun parseHabitsToJsonWithSpecials(
+        habits: List<Habit>,
+        specials: List<HabitDTO>
+    ): String {
+        val dtoMap = (habits.map { it.toHabitDTO() } + specials)
+            .fold(mapOf<String, HabitDTO>()) { acc, dto ->
+                acc + (dto.id to dto)
+            }
+        return this.json.encodeToString(dtoMap)
     }
 
-    fun parseHabitsToJsonWithSpecials(habits: List<Habit>, specials: List<JsonElement>): String {
-        return habits.map { it.toDTO() }.toTamaCompatStringWithSpecials(specials)
-    }
-
-    fun polymorphicParseFromJson(json: String): Map<String, HabitDTO> {
+    private fun polymorphicParseFromJson(json: String): Map<String, HabitDTO> {
         return this.json.decodeFromString<Map<String, HabitDTO>>(json)
     }
 
@@ -266,87 +276,8 @@ class HabitRepository {
     }
 
     fun parseFromJson(json: String) {
-        val (habits, specials) = parseHabitsFromJsonWithJsonAddition(json)
-        _habits.value = habits
-        this.specials = specials
+        val dtos: List<HabitDTO> = polymorphicParseFromJson(json).values.toList()
+        _habits.value = dtos.filter { it !is PlannedHabitDTO }.map { it.toHabit() }
+        this.specials = dtos.filterIsInstance<PlannedHabitDTO>()
     }
-
-    fun parseHabitsFromJson(json: String): List<Habit> {
-        // this is naive for one variation. to all first parse to json element and check for sign
-        return Json.decodeFromString<Map<String, SingleHabitDTO2>>(json).values.map { it.toHabit() }
-    }
-
-    fun parseHabitsFromJsonWithJsonAddition(json: String): Pair<List<Habit>, List<JsonElement>> {
-        val jsonHabits: JsonElement = Json.decodeFromString(json)
-        val specialHabits: MutableList<JsonElement> = mutableListOf()
-        val singleHabits: MutableList<SingleHabitDTO2> = mutableListOf()
-        for (j in jsonHabits.jsonObject.values) {
-            if (
-                j.jsonObject["scheduled_tasks"] != null ||
-                j.jsonObject["planned_task"] != null
-            ) {
-                println(j)
-                specialHabits.add(j)
-            } else {
-                singleHabits.add(Json.decodeFromJsonElement(j))
-            }
-        }
-        Log.d(TAG, "parseHabitsFromJsonWithJsonAddition: \n${singleHabits}\n${specialHabits}")
-        return singleHabits.map { it.toHabit() }.toList() to specialHabits.toList()
-    }
-}
-
-fun main() {
-    val string = """
-       {
-  "1": {
-    "completed": false,
-    "failed": false,
-    "id": "1",
-    "name": "Daily Goal",
-    "planned_task": [
-      { "day": 4, "month": 3, "tasks": ["hun", ""], "year": 2025 },
-      { "day": 5, "month": 3, "tasks": ["innk"], "year": 2025 }
-    ],
-    "start_at_streak": 0
-  },
-  "2": {
-    "completed": false,
-    "failed": false,
-    "id": "2",
-    "name": "habits",
-    "scheduled_tasks": [
-      {
-        "completed": false,
-        "enabled": false,
-        "id": "2",
-        "name": "One Approach",
-        "parent": "e",
-        "weekdays": [1, 2, 3]
-      },
-      {
-        "completed": false,
-        "enabled": true,
-        "id": "2",
-        "name": "medicine",
-        "parent": "e",
-        "weekdays": [3]
-      }
-    ],
-    "start_at_streak": 0
-  },
-  "3": {
-    "completed": false,
-    "failed": false,
-    "id": "3",
-    "name": "Sleep before 1h",
-    "start_at_streak": 3,
-    "streak_name": { "6": "Sleep before 12h" }
-  }
-} 
-    """.trimIndent()
-    val (habits, specials) = HabitRepository().parseHabitsFromJsonWithJsonAddition(string)
-    val s2 = HabitRepository().parseHabitsToJsonWithSpecials(habits, specials)
-    println(s2)
-
 }
