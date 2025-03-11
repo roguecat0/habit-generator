@@ -4,6 +4,8 @@ import com.example.habitgenerator.services.dto.SingleHabitDTO2
 import com.example.habitgenerator.services.dto.toDTO
 import com.example.habitgenerator.services.dto.toTamaCompatString
 import com.example.habitgenerator.services.dto.toTamaCompatStringWithSpecials
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -12,8 +14,25 @@ import kotlinx.serialization.json.jsonObject
 const val TAG = "HabitRepository"
 
 class HabitRepository {
+    private val _habits = MutableStateFlow<List<Habit>>(emptyList())
+    val habits: StateFlow<List<Habit>> get() = _habits
     fun changeHabitName(habit: Habit, name: String): Habit {
         return habit.copy(name = name)
+    }
+
+    fun deleteHabit(id: Int) {
+        _habits.value = _habits.value.filterIndexed { i, _ -> i != id }
+    }
+
+    fun getHabits2(): StateFlow<List<Habit>> = habits
+
+    fun changeAHabitValue(id: Int, operation: (Habit) -> Habit) {
+        _habits.value = mapHabitAtId(_habits.value, id, operation)
+    }
+
+    fun addNewHabit() {
+        val id = getNewId(_habits.value)
+        _habits.value += Habit(id = id)
     }
 
     fun addScheduledWeek(habit: Habit): Habit {
@@ -60,7 +79,6 @@ class HabitRepository {
                             is ScheduledType.Interval -> type.copy(intervalDays = amount)
                             else -> type
                         }
-
                     )
                 }
             )
@@ -230,6 +248,16 @@ class HabitRepository {
 
     fun parseHabitsToJsonWithSpecials(habits: List<Habit>, specials: List<JsonElement>): String {
         return habits.map { it.toDTO() }.toTamaCompatStringWithSpecials(specials)
+    }
+
+    fun parseToJson(specials: List<JsonElement>): String {
+        return parseHabitsToJsonWithSpecials(_habits.value, specials)
+    }
+
+    fun parseFromJson(json: String): List<JsonElement> {
+        val (habits, specials) = parseHabitsFromJsonWithJsonAddition(json)
+        _habits.value = habits
+        return specials
     }
 
     fun parseHabitsFromJson(json: String): List<Habit> {

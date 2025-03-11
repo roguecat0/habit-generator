@@ -3,11 +3,14 @@ package com.example.habitgenerator.presentation
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.habitgenerator.services.Habit
 import com.example.habitgenerator.services.HabitRepository
-import com.example.habitgenerator.services.util.splitPairs
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 
 const val TAG = "EditHabitListViewModel"
@@ -16,8 +19,16 @@ class EditHabitListViewModel(
     private val habitRepository: HabitRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(EditHabitListState())
-    val state = _state.asStateFlow()
+    private val _habits = habitRepository.getHabits2()
+    val state: StateFlow<EditHabitListState> = combine(_state, _habits) { state, habits ->
+        state.copy(
+            habits = habits.map { habit ->
+                habit to state.indexExpandedHabits.contains(habit.id)
+            }
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), EditHabitListState())
 
     fun onEvent(event: EditHabitListEvent) {
         Log.d(TAG, "onEvent: event: $event")
@@ -147,9 +158,9 @@ class EditHabitListViewModel(
     }
 
     private fun deleteHabit(id: Int) {
+        habitRepository.deleteHabit(id)
         _state.value = _state.value.copy(
-            habits = _state.value.habits
-                .filter { uiHabit -> uiHabit.first.id != id }
+            indexExpandedHabits = _state.value.indexExpandedHabits.filter { it != id }
         )
     }
 
@@ -173,11 +184,7 @@ class EditHabitListViewModel(
     }
 
     private fun changeAHabitValue(id: Int, operation: (Habit) -> Habit) {
-        val (habits, expandedItems) = _state.value.habits.splitPairs()
-        val uiHabits = habitRepository
-            .mapHabitAtId(habits, id, operation)
-            .zip(expandedItems)
-        _state.value = _state.value.copy(habits = uiHabits)
+        habitRepository.changeAHabitValue(id, operation)
     }
 
     private fun addHabitStreakName(id: Int) {
@@ -212,30 +219,21 @@ class EditHabitListViewModel(
 
     private fun toggleHabitExpand(id: Int) {
         _state.value = _state.value.copy(
-            habits = _state.value.habits
-                .map { uiHabit ->
-                    if (uiHabit.first.id == id) {
-                        uiHabit.first to !uiHabit.second
-                    } else {
-                        uiHabit
-                    }
-                }
+            indexExpandedHabits = if (_state.value.indexExpandedHabits.contains(id)) {
+                _state.value.indexExpandedHabits.filter { id != it }
+            } else {
+                _state.value.indexExpandedHabits + id
+            }
         )
+        Log.d(TAG, "toggleHabitExpand: ${_state.value.indexExpandedHabits}")
     }
 
     private fun newHabit() {
-        val (habits, _) = _state.value.habits.splitPairs()
-        val id = habitRepository.getNewId(habits)
-        val newUiHabit = Habit(id = id) to false
-        val inter = _state.value.habits + newUiHabit
-        _state.value = _state.value
-            .copy(habits = inter)
+        habitRepository.addNewHabit()
     }
 
     private fun parseHabitsToClipboard(clipboardCopy: (String) -> Unit) {
-        val (habits, _) = _state.value.habits.splitPairs()
-        val json = habitRepository.parseHabitsToJsonWithSpecials(
-            habits,
+        val json = habitRepository.parseToJson(
             _state.value.specials
         )
         Log.d(TAG, "parseHabitsToClipboard: $json")
@@ -244,12 +242,10 @@ class EditHabitListViewModel(
 
     private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {
         getStringFromClip()?.let { json ->
-            val (habits, specials) = habitRepository.parseHabitsFromJsonWithJsonAddition(json)
+            val specials = habitRepository.parseFromJson(json)
             _state.value = EditHabitListState(
-                habits = habits.zip(habits.map { false }),
                 specials = specials,
             )
         }
     }
-
 }
