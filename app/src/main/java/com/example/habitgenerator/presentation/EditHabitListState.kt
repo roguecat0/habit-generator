@@ -6,7 +6,6 @@ import kotlinx.serialization.json.JsonElement
 data class EditHabitListState(
     val habits: List<Pair<Habit, Boolean>> = emptyList(),
     val indexExpandedHabits: List<Int> = emptyList(),
-    val specials: List<JsonElement> = emptyList(),
 )
 
 sealed interface EditHabitListEvent {

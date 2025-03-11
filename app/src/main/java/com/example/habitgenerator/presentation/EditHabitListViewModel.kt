@@ -233,19 +233,14 @@ class EditHabitListViewModel(
     }
 
     private fun parseHabitsToClipboard(clipboardCopy: (String) -> Unit) {
-        val json = habitRepository.parseToJson(
-            _state.value.specials
-        )
+        val json = habitRepository.parseToJson()
         Log.d(TAG, "parseHabitsToClipboard: $json")
         clipboardCopy(json)
     }
 
     private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {
         getStringFromClip()?.let { json ->
-            val specials = habitRepository.parseFromJson(json)
-            _state.value = EditHabitListState(
-                specials = specials,
-            )
+            _state.value = EditHabitListState()
         }
     }
 }

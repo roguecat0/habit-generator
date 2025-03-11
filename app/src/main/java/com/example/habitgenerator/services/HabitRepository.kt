@@ -14,6 +14,7 @@ import kotlinx.serialization.json.jsonObject
 const val TAG = "HabitRepository"
 
 class HabitRepository {
+    private var specials: List<JsonElement> = emptyList()
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits: StateFlow<List<Habit>> get() = _habits
     fun changeHabitName(habit: Habit, name: String): Habit {
@@ -21,7 +22,7 @@ class HabitRepository {
     }
 
     fun deleteHabit(id: Int) {
-        _habits.value = _habits.value.filterIndexed { i, _ -> i != id }
+        _habits.value = _habits.value.filter { habit -> habit.id != id }
     }
 
     fun getHabits2(): StateFlow<List<Habit>> = habits
@@ -250,14 +251,14 @@ class HabitRepository {
         return habits.map { it.toDTO() }.toTamaCompatStringWithSpecials(specials)
     }
 
-    fun parseToJson(specials: List<JsonElement>): String {
-        return parseHabitsToJsonWithSpecials(_habits.value, specials)
+    fun parseToJson(): String {
+        return parseHabitsToJsonWithSpecials(_habits.value, this.specials)
     }
 
-    fun parseFromJson(json: String): List<JsonElement> {
+    fun parseFromJson(json: String) {
         val (habits, specials) = parseHabitsFromJsonWithJsonAddition(json)
         _habits.value = habits
-        return specials
+        this.specials = specials
     }
 
     fun parseHabitsFromJson(json: String): List<Habit> {
