@@ -48,7 +48,8 @@ class HabitRepository {
             scheduled.copy(
                 scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
                     id = Random.nextInt(),
-                    scheduledType = ScheduledType.Weekdays()
+                    scheduledType = ScheduledType.Weekdays(),
+                    parent = habit.id
                 )
             )
         }
@@ -59,7 +60,9 @@ class HabitRepository {
             scheduled.copy(
                 scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
                     id = Random.nextInt(),
-                    scheduledType = ScheduledType.Interval()
+                    scheduledType = ScheduledType.Interval(),
+                    parent = habit.id
+
                 )
             )
         }

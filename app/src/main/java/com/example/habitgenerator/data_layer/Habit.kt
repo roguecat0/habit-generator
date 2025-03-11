@@ -32,7 +32,7 @@ data class PlannedHabit(
 data class ScheduledHabit(
     val id: Int = 0,
     val name: String = "",
-    val completed: Boolean = true,
+    val completed: Boolean = false,
     val enabled: Boolean = true,
     val parent: Int = -1,
     val scheduledType: ScheduledType,
