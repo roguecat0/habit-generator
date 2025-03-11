@@ -240,7 +240,7 @@ class EditHabitListViewModel(
 
     private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {
         getStringFromClip()?.let { json ->
-            _state.value = EditHabitListState()
+            habitRepository.parseFromJson(json)
         }
     }
 }

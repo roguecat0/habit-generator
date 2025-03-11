@@ -1,5 +1,7 @@
 package com.example.habitgenerator.data_layer
 
+import android.util.Log
+import com.example.habitgenerator.data_layer.dto.HabitDTO
 import com.example.habitgenerator.data_layer.dto.SingleHabitDTO2
 import com.example.habitgenerator.data_layer.dto.toDTO
 import com.example.habitgenerator.data_layer.dto.toTamaCompatString
@@ -10,10 +12,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlin.random.Random
 
 const val TAG = "HabitRepository"
 
 class HabitRepository {
+    private val json = Json { ignoreUnknownKeys = true }
     private var specials: List<JsonElement> = emptyList()
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits: StateFlow<List<Habit>> get() = _habits
@@ -40,6 +44,7 @@ class HabitRepository {
         return changeScheduleValue(habit) { scheduled ->
             scheduled.copy(
                 scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
+                    id = Random.nextInt(),
                     scheduledType = ScheduledType.Weekdays()
                 )
             )
@@ -50,6 +55,7 @@ class HabitRepository {
         return changeScheduleValue(habit) { scheduled ->
             scheduled.copy(
                 scheduledHabits = scheduled.scheduledHabits + ScheduledHabit(
+                    id = Random.nextInt(),
                     scheduledType = ScheduledType.Interval()
                 )
             )
@@ -251,6 +257,10 @@ class HabitRepository {
         return habits.map { it.toDTO() }.toTamaCompatStringWithSpecials(specials)
     }
 
+    fun polymorphicParseFromJson(json: String): Map<String, HabitDTO> {
+        return this.json.decodeFromString<Map<String, HabitDTO>>(json)
+    }
+
     fun parseToJson(): String {
         return parseHabitsToJsonWithSpecials(_habits.value, this.specials)
     }
@@ -281,6 +291,7 @@ class HabitRepository {
                 singleHabits.add(Json.decodeFromJsonElement(j))
             }
         }
+        Log.d(TAG, "parseHabitsFromJsonWithJsonAddition: \n${singleHabits}\n${specialHabits}")
         return singleHabits.map { it.toHabit() }.toList() to specialHabits.toList()
     }
 }
