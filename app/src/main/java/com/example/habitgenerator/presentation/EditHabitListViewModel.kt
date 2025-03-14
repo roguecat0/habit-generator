@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.example.habitgenerator.Screen
 import com.example.habitgenerator.data_layer.Habit
 import com.example.habitgenerator.data_layer.HabitRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,11 @@ class EditHabitListViewModel(
             }
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), EditHabitListState())
+
+    init {
+        val id = savedStateHandle.toRoute<Screen.EditHabitListScreen>()
+        Log.d("tag", "id: $id")
+    }
 
     fun onEvent(event: EditHabitListEvent) {
         Log.d(TAG, "onEvent: event: $event")

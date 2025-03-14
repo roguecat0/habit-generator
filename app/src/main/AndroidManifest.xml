@@ -23,6 +23,19 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter
+                android:autoVerify="true"
+                tools:ignore="AppLinkUrlError">
+                <data android:scheme="api" />
+                <!--                <data android:scheme="https" />-->
+                <data android:host="habit-gen.com" />
+                <data android:host="www.habit-gen.com" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <action android:name="android.intent.action.VIEW" />
+            </intent-filter>
         </activity>
     </application>
 

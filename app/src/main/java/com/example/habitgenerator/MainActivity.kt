@@ -23,17 +23,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-sealed interface Screen {
-    // needs to be a lib also needs to be a plugin...
-    @Serializable
-    data object EditHabitListScreen: Screen
-}
 
 
 @Composable
 fun Greeting(
     name: String, modifier: Modifier = Modifier,
- ) {
+) {
     Text(
         text = "Hello $name!",
         modifier = modifier
