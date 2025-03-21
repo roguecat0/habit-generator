@@ -1,7 +1,10 @@
 package com.example.habitgenerator
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -51,4 +54,9 @@ fun App() {
         }
     }
 
+}
+fun Context.getActivity(): ComponentActivity? = when (this) {
+    is ComponentActivity -> this
+    is ContextWrapper -> baseContext.getActivity()
+    else -> null
 }
