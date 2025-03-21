@@ -23,11 +23,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter
-                android:autoVerify="true"
-                tools:ignore="AppLinkUrlError">
+
+            <intent-filter android:autoVerify="true">
                 <data android:scheme="api" />
-                <!--                <data android:scheme="https" />-->
+                <data android:scheme="https" />
                 <data android:host="habit-gen.com" />
                 <data android:host="www.habit-gen.com" />
 

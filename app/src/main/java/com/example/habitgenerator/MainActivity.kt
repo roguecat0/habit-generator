@@ -1,6 +1,7 @@
 package com.example.habitgenerator
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +18,9 @@ import org.koin.androidx.compose.koinViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        intent?.data?.let { uri ->
+            Log.d("DeepLink", "Received deep link: $uri")
+        }
         enableEdgeToEdge()
         setContent {
             App()

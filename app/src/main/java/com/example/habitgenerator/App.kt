@@ -22,7 +22,7 @@ sealed interface Screen {
     data object EditHabitListScreen : Screen
 
     @Serializable
-    data object DeepLinkScreen : Screen
+    data class DeepLinkScreen(val id: Int) : Screen
 }
 
 
@@ -31,7 +31,10 @@ fun App() {
     HabitGeneratorTheme {
         val navController = rememberNavController()
 
-        NavHost(navController, startDestination = Screen.EditHabitListScreen) {
+        NavHost(
+            navController,
+            startDestination = Screen.EditHabitListScreen
+        ) {
             composable<Screen.EditHabitListScreen> {
                 Log.d("tag", "App: going here")
                 EditHabitListScreenRoot()
@@ -43,12 +46,7 @@ fun App() {
                     )
                 )
             ) {
-                val uri = navDeepLink<Screen.DeepLinkScreen>(
-                    basePath = "api://$DEEP_LINK_DOMAIN"
-                ).uriPattern
-                Log.d("tag", "App: uri $uri")
-                Text("hello $uri :: ${it.toRoute<Screen.DeepLinkScreen>()}")
-//                EditHabitListScreenRoot()
+                Text("hello :: ${it.toRoute<Screen.DeepLinkScreen>()}")
             }
         }
     }
