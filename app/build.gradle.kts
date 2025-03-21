@@ -51,7 +51,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     testImplementation(libs.junit)
-    testImplementation(libs.junit.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -62,7 +61,7 @@ dependencies {
     implementation(project.dependencies.platform(libs.koin.bom))
     implementation(libs.koin.core)
     implementation(libs.koin.androidx.compose)
-    implementation(libs.koin.androidx.compose.navigation)
+//    implementation(libs.koin.androidx.compose.navigation)
     // navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)

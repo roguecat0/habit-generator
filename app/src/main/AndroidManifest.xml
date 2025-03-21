@@ -25,15 +25,20 @@
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
-                <data android:scheme="api" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW" />
                 <data android:scheme="https" />
                 <data android:host="habit-gen.com" />
                 <data android:host="www.habit-gen.com" />
-
+            </intent-filter>
+            <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <action android:name="android.intent.action.VIEW" />
+                <data android:scheme="api" />
+                <data android:host="habit-gen.com" />
+                <data android:host="www.habit-gen.com" />
             </intent-filter>
         </activity>
     </application>
