@@ -22,10 +22,7 @@ const val DEEP_LINK_DOMAIN = "habit-gen.com"
 sealed interface Screen {
     // needs to be a lib also needs to be a plugin...
     @Serializable
-    data object EditHabitListScreen : Screen
-
-    @Serializable
-    data class DeepLinkScreen(val id: Int) : Screen
+    data class EditHabitListScreen(val tag: Int?) : Screen
 }
 
 
@@ -36,27 +33,18 @@ fun App() {
 
         NavHost(
             navController,
-            startDestination = Screen.EditHabitListScreen
+            startDestination = Screen.EditHabitListScreen(null)
         ) {
-            composable<Screen.EditHabitListScreen> {
-                Log.d("tag", "App: going here")
-                EditHabitListScreenRoot()
-            }
-            composable<Screen.DeepLinkScreen>(
+            composable<Screen.EditHabitListScreen>(
                 deepLinks = listOf(
-                    navDeepLink<Screen.DeepLinkScreen>(
+                    navDeepLink<Screen.EditHabitListScreen>(
                         basePath = "api://$DEEP_LINK_DOMAIN"
                     )
                 )
             ) {
-                Text("hello :: ${it.toRoute<Screen.DeepLinkScreen>()}")
+                EditHabitListScreenRoot()
             }
         }
     }
 
-}
-fun Context.getActivity(): ComponentActivity? = when (this) {
-    is ComponentActivity -> this
-    is ContextWrapper -> baseContext.getActivity()
-    else -> null
 }

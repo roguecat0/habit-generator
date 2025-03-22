@@ -90,6 +90,8 @@ fun MultiFab(
                 clipboardManager.setText(AnnotatedString(json))
             })
             Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+            val launchIntent = context.packageManager.getLaunchIntentForPackage("org.godotengine.tamagacha")
+            context.startActivity(launchIntent)
         }
         ) {
             Icon(Icons.Filled.Done, contentDescription = "")
