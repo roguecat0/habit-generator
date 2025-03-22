@@ -1,6 +1,7 @@
 package com.example.habitgenerator.data_layer
 
 import android.util.Log
+import androidx.core.net.toUri
 import com.example.habitgenerator.data_layer.dto.HabitDTO
 import com.example.habitgenerator.data_layer.dto.PlannedHabitDTO
 import com.example.habitgenerator.data_layer.dto.SingleHabitDTO2
@@ -15,11 +16,15 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import kotlin.random.Random
 
 const val TAG = "HabitRepository"
 
-class HabitRepository {
+class HabitRepository(
+    val context: android.content.Context,
+) {
     private val json = Json { ignoreUnknownKeys = true }
     private var specials: List<HabitDTO> = emptyList()
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
@@ -130,6 +135,30 @@ class HabitRepository {
                 }
             )
         }
+    }
+    fun loadHabitsFromFile(uri: String) {
+        val json = readFileFromUri(uri)
+        val habits = extractHabitsJson(json)
+        parseFromJson(habits)
+    }
+    private fun extractHabitsJson(json: String): String {
+        val jsonElement = this.json.parseToJsonElement(json)
+        val habitsObject = jsonElement.jsonObject["tasks"]
+        return habitsObject?.toString() ?: ""
+    }
+    private fun readFileFromUri(uri: String): String {
+        val stringBuilder = StringBuilder()
+        this.context.contentResolver.openInputStream(uri.toUri())?.use { inputStream ->
+            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                var line: String? = reader.readLine()
+                while (line != null) {
+                    stringBuilder.append(line)
+                    line = reader.readLine()
+                }
+            }
+        }
+        Log.d(TAG, "readFileFromUri: $stringBuilder")
+        return stringBuilder.toString()
     }
 
     fun deleteScheduledHabit(habit: Habit, index: Int): Habit {

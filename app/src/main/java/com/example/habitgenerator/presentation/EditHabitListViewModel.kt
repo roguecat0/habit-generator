@@ -1,6 +1,9 @@
 package com.example.habitgenerator.presentation
 
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,13 +16,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import org.koin.compose.koinInject
+import org.koin.core.KoinApplication.Companion.init
 
 
 const val TAG = "EditHabitListViewModel"
 
 class EditHabitListViewModel(
     private val habitRepository: HabitRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EditHabitListState())
@@ -33,8 +39,12 @@ class EditHabitListViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), EditHabitListState())
 
     init {
-        val id = savedStateHandle.toRoute<Screen.EditHabitListScreen>()
-        Log.d("tag", "id: $id")
+        val route = savedStateHandle.toRoute<Screen.EditHabitListScreen>()
+        val uri = sharedPreferences.getString("uri",null)
+        Log.d(TAG, "init: $route, uri: $uri")
+        if (uri != null && route.tag != null) {
+            habitRepository.loadHabitsFromFile(uri)
+        }
     }
 
     fun onEvent(event: EditHabitListEvent) {
