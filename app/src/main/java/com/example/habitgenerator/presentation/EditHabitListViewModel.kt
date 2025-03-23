@@ -1,5 +1,6 @@
 package com.example.habitgenerator.presentation
 
+import android.R.attr.tag
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.Log
@@ -253,6 +254,10 @@ class EditHabitListViewModel(
         val json = habitRepository.parseToJson()
         Log.d(TAG, "parseHabitsToClipboard: $json")
         clipboardCopy(json)
+        val uri = sharedPreferences.getString("uri", null)
+        if (uri != null && savedStateHandle.toRoute<Screen.EditHabitListScreen>().tag != null) {
+            habitRepository.writeHabitsToFile(uri)
+        }
     }
 
     private fun parseFromHabitsFromClipboard(getStringFromClip: () -> String?) {

@@ -1,5 +1,6 @@
 package com.example.habitgenerator.data_layer
 
+import android.R.attr.data
 import android.util.Log
 import androidx.core.net.toUri
 import com.example.habitgenerator.data_layer.dto.HabitDTO
@@ -159,6 +160,26 @@ class HabitRepository(
         }
         Log.d(TAG, "readFileFromUri: $stringBuilder")
         return stringBuilder.toString()
+    }
+    private fun writeToFile(uri: String, data: String) {
+        this.context.contentResolver.openOutputStream(uri.toUri())?.use { outputStream ->
+            outputStream.write(data.toByteArray())
+        }
+        Log.d(TAG, "readFileFromUri: I wrote to file")
+    }
+    fun writeHabitsToFile(uri: String) {
+        val data = readFileFromUri(uri)
+        val newJson = mergeHabitsChanges(data)
+        Log.d(TAG, "writeHabitsToFile: $newJson")
+        writeToFile(uri, newJson)
+    }
+    fun mergeHabitsChanges(fileBlob: String) : String {
+        var fileJson = json.parseToJsonElement(fileBlob)
+        val s = parseToJson()
+        val habitsJson = json.parseToJsonElement(s)
+        val mutableMap = fileJson.jsonObject.toMutableMap()
+        mutableMap["tasks"] = habitsJson
+        return json.encodeToString(mutableMap)
     }
 
     fun deleteScheduledHabit(habit: Habit, index: Int): Habit {
